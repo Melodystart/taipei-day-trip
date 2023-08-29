@@ -42,43 +42,55 @@ def getPage():
 		page = int(request.args.get("page", -1))
 		keyword = request.args.get("keyword", None)
 
+		if page < 0:
+			result["error"] = True
+			result["message"] = "page未輸入 或 page輸入非資料有效範圍內"
+			return result, 500
+
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
 		if keyword == None:       #沒有給定關鍵字則不做篩選
-			cursor.execute("SELECT * FROM main")
+			cursor.execute("SELECT * FROM main LIMIT %s, 12",(page*12,))
 			data = cursor.fetchall()
+
+			cursor.execute("SELECT * FROM main LIMIT %s, 12",(page*12+12,))
+			nextData = cursor.fetchall()
+			
 		else:                     #關鍵字完全比對捷運站名稱
-			cursor.execute("SELECT * FROM main WHERE mrt =%s",(keyword,))
+			cursor.execute("SELECT * FROM main WHERE mrt =%s LIMIT %s, 12",(keyword, page*12))
 			data = cursor.fetchall()
-			if (len(data) == 0):    #關鍵字模糊比對景點名稱
-				cursor.execute("SELECT * FROM main WHERE name LIKE %s",("%"+ keyword +"%",))
+
+			cursor.execute("SELECT * FROM main WHERE mrt =%s LIMIT %s, 12",(keyword, page*12+12))
+			nextData = cursor.fetchall()
+			if len(data) == 0:      #關鍵字模糊比對景點名稱
+				cursor.execute("SELECT * FROM main WHERE name LIKE %s LIMIT %s, 12",("%"+ keyword +"%", page*12))
 				data = cursor.fetchall()
-				if (len(data) == 0):  #關鍵字找不到符合資料
+
+				cursor.execute("SELECT * FROM main WHERE name LIKE %s LIMIT %s, 12",("%"+ keyword +"%", page*12+12))
+				nextData = cursor.fetchall()
+
+				if (len(data) == 0) & (page == 0):
 					result["error"] = True
-					result["message"] = "關鍵字完全比對捷運站名稱、或模糊比對景點名稱結果：找不到符合資料"
+					result["message"] = "找不到符合keyword資料"
 					return result, 500
 
 		cursor.close()
 		con.close()
 
-		if page < 0 or page > math.floor(len(data)/12):
+		if len(data) == 0:
 			result["error"] = True
-			result["message"] = "page未輸入 或 輸入非資料有效範圍內"
+			result["message"] = "page輸入非資料有效範圍內"
 			return result, 500
 
-		nextPage = page+1
-		if page == math.floor(len(data)/12): 
+		nextPage = page + 1
+		if len(nextData) == 0: 
 			nextPage = None
+
 		result["nextPage"] = nextPage
 		result["data"] = []
 
-		start = page*12
-		stop = start+12
-		if stop > len(data):   #最後一頁stop最多取到資料量數
-			stop = len(data)
-
-		for i in range(start,stop):
+		for i in range(len(data)):
 			item = {}
 			item["id"] = data[i][0]
 			item["name"] = data[i][1] 
@@ -132,7 +144,7 @@ def getAttraction(attractionId):
 
 	except Exception as e:
 		result["error"] = True
-		result["message"] = e.__class__.__name__+": "+e.args[0]
+		result["message"] = e.__class__.__name__+": "+str(e.args[0])
 		return result, 500
 
 @app.route("/api/mrts",methods=['GET'])
