@@ -6,19 +6,6 @@ app=Flask(__name__)
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 
-def getImages(id):
-	con = conPool.get_connection()
-	cursor = con.cursor()
-	cursor.execute("SELECT images FROM main LEFT JOIN image on main.id = image.attraction_id WHERE main.id =%s",(int(id),))
-	items = cursor.fetchall()
-	cursor.close()
-	con.close()
-
-	images = []
-	for item in items:
-		images.append(item[0])
-	return images
-
 conPool = pooling.MySQLConnectionPool(user='root', password='password', host='localhost', database='attractions', pool_name='attractionsConPool', pool_size=10)
 
 # Pages
@@ -51,23 +38,30 @@ def getPage():
 		cursor = con.cursor()
 
 		if keyword == None:       #沒有給定關鍵字則不做篩選
-			cursor.execute("SELECT * FROM main LIMIT %s, 12",(page*12,))
+			sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id LIMIT %s, 12"
+
+			cursor.execute(sql,(page*12,))
 			data = cursor.fetchall()
 
-			cursor.execute("SELECT * FROM main LIMIT %s, 12",(page*12+12,))
+			cursor.execute(sql,(page*12+12,))
 			nextData = cursor.fetchall()
 			
 		else:                     #關鍵字完全比對捷運站名稱
-			cursor.execute("SELECT * FROM main WHERE mrt =%s LIMIT %s, 12",(keyword, page*12))
+			sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE mrt =%s LIMIT %s, 12"
+
+			cursor.execute(sql,(keyword, page*12))
 			data = cursor.fetchall()
 
-			cursor.execute("SELECT * FROM main WHERE mrt =%s LIMIT %s, 12",(keyword, page*12+12))
+			cursor.execute(sql,(keyword, page*12+12))
 			nextData = cursor.fetchall()
+
 			if len(data) == 0:      #關鍵字模糊比對景點名稱
-				cursor.execute("SELECT * FROM main WHERE name LIKE %s LIMIT %s, 12",("%"+ keyword +"%", page*12))
+				sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE name LIKE %s LIMIT %s, 12"	
+
+				cursor.execute(sql,("%"+ keyword +"%", page*12))
 				data = cursor.fetchall()
 
-				cursor.execute("SELECT * FROM main WHERE name LIKE %s LIMIT %s, 12",("%"+ keyword +"%", page*12+12))
+				cursor.execute(sql,("%"+ keyword +"%", page*12+12))
 				nextData = cursor.fetchall()
 
 				if (len(data) == 0) & (page == 0):
@@ -101,13 +95,13 @@ def getPage():
 			item["mrt"] = data[i][6]	    
 			item["lat"] = data[i][7]
 			item["lng"] = data[i][8]	
-			item["images"] = getImages(data[i][0])	
+			item["images"] = data[i][9].split(',')
 			result["data"].append(item)
 		return result, 200
 
 	except Exception as e:
 		result["error"] = True
-		result["message"] = e.__class__.__name__+": "+e.args[0]
+		result["message"] = e.__class__.__name__+": "+str(e.args[0])
 		return result, 500
 
 
@@ -118,7 +112,9 @@ def getAttraction(attractionId):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
-		cursor.execute("SELECT * FROM main WHERE id =%s",(attractionId,))
+		sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE id =%s"	
+
+		cursor.execute(sql,(attractionId,))
 		data = cursor.fetchone()
 
 		cursor.close()
@@ -139,7 +135,7 @@ def getAttraction(attractionId):
 		result["data"]["mrt"] = data[6]	    
 		result["data"]["lat"] = data[7]
 		result["data"]["lng"] = data[8]	
-		result["data"]["images"] = getImages(data[0])	
+		result["data"]["images"] = data[9].split(',')
 		return result, 200
 
 	except Exception as e:
@@ -167,7 +163,7 @@ def getMrts():
 
 	except Exception as e:
 		result["error"] = True
-		result["message"] = e.__class__.__name__+": "+e.args[0]
+		result["message"] = e.__class__.__name__+": "+str(e.args[0])
 		return result, 500
 	
 app.run(host="0.0.0.0", port=3000)
