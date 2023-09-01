@@ -97,7 +97,9 @@ def getPage():
 			item["lng"] = data[i][8]	
 			item["images"] = data[i][9].split(',')
 			result["data"].append(item)
-		return result, 200
+		response = make_response(result)
+		response.headers["Content-Type"] = "application/json; charset=utf-8"
+		return response, 200
 
 	except Exception as e:
 		result["error"] = True
@@ -136,7 +138,9 @@ def getAttraction(attractionId):
 		result["data"]["lat"] = data[7]
 		result["data"]["lng"] = data[8]	
 		result["data"]["images"] = data[9].split(',')
-		return result, 200
+		response = make_response(result)
+		response.headers["Content-Type"] = "application/json; charset=utf-8"
+		return response, 200
 
 	except Exception as e:
 		result["error"] = True
@@ -159,7 +163,9 @@ def getMrts():
 		result["data"] = []
 		for i in range(len(data)):
 			result["data"].append(data[i][1])
-		return result, 200
+		response = make_response(result)
+		response.headers["Content-Type"] = "application/json; charset=utf-8"
+		return response, 200
 
 	except Exception as e:
 		result["error"] = True
