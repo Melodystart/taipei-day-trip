@@ -2,7 +2,11 @@ import mysql.connector
 from mysql.connector import pooling
 import math
 from flask import *
-app=Flask(__name__)
+app=Flask(
+	__name__,
+  static_folder="public",
+  static_url_path="/"
+	)
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 
@@ -46,28 +50,19 @@ def getPage():
 			cursor.execute(sql,(page*12+12,))
 			nextData = cursor.fetchall()
 			
-		else:                     #關鍵字完全比對捷運站名稱
-			sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE mrt =%s LIMIT %s, 12"
+		else:
+			sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE name LIKE %s OR mrt =%s LIMIT %s, 12"	
 
-			cursor.execute(sql,(keyword, page*12))
+			cursor.execute(sql,("%"+ keyword +"%", keyword, page*12))
 			data = cursor.fetchall()
 
-			cursor.execute(sql,(keyword, page*12+12))
+			cursor.execute(sql,("%"+ keyword +"%", keyword, page*12+12))
 			nextData = cursor.fetchall()
 
-			if len(data) == 0:      #關鍵字模糊比對景點名稱
-				sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE name LIKE %s LIMIT %s, 12"	
-
-				cursor.execute(sql,("%"+ keyword +"%", page*12))
-				data = cursor.fetchall()
-
-				cursor.execute(sql,("%"+ keyword +"%", page*12+12))
-				nextData = cursor.fetchall()
-
-				if (len(data) == 0) & (page == 0):
-					result["error"] = True
-					result["message"] = "找不到符合keyword資料"
-					return result, 500
+			if (len(data) == 0) & (page == 0):
+				result["error"] = True
+				result["message"] = "找不到符合keyword資料"
+				return result, 500
 
 		cursor.close()
 		con.close()
@@ -162,7 +157,8 @@ def getMrts():
 
 		result["data"] = []
 		for i in range(len(data)):
-			result["data"].append(data[i][1])
+			if (data[i][1] != None):
+				result["data"].append(data[i][1])
 		response = make_response(result)
 		response.headers["Content-Type"] = "application/json; charset=utf-8"
 		return response, 200
