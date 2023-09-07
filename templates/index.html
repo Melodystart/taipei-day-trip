@@ -95,7 +95,7 @@
       const keyword = document.querySelector(".search-input-text").value
 
       url = '/api/attractions?page=' + page + '&keyword=' + keyword
-      console.log(url)
+      // console.log(url)
 
       fetch(url, { method: 'get' })
         .then(response => response.json())
