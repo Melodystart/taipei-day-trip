@@ -149,7 +149,7 @@ def getMrts():
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
-		cursor.execute("SELECT count(name) AS name_count, mrt FROM main GROUP BY mrt ORDER BY name_count DESC LIMIT 40;")
+		cursor.execute("SELECT count(name) AS name_count, mrt FROM main GROUP BY mrt ORDER BY name_count DESC, CONVERT(SUBSTR(mrt,1,1) USING BIG5) DESC LIMIT 40;")
 		data = cursor.fetchall()
 
 		cursor.close()
