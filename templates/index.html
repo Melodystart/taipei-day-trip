@@ -95,7 +95,13 @@
       const keyword = document.querySelector(".search-input-text").value
 
       url = '/api/attractions?page=' + page + '&keyword=' + keyword
-      // console.log(url)
+
+      if (count[page]) {  //若該頁數已呼叫過API，則僅計次數且不再重複呼叫API增加景點
+        count[page] += 1;
+        return
+      } else {
+        count[page] = 1;
+      }
 
       fetch(url, { method: 'get' })
         .then(response => response.json())
@@ -103,19 +109,14 @@
           if (responseJson["error"]) {
             attractionsGroup.innerText = "搜尋不到資料"
           } else {
-            if (count[page]) {  //若該頁數API已呼叫過，則僅計數且不再重複增加景點
-              count[page] += 1
-              return
-            } else {
-              count[page] = 1
 
-              const data = responseJson["data"]
-              data.forEach(item => {
+            const data = responseJson["data"]
+            data.forEach(item => {
 
-                const attraction = document.createElement("div");
-                attraction.classList.add("attraction");
-                attraction.innerHTML =
-                  `
+              const attraction = document.createElement("div");
+              attraction.classList.add("attraction");
+              attraction.innerHTML =
+                `
             <img class="attraction-img" src="${item["images"][0]}" width="270" height="197">
             <div class="details-middle">
               <div class="name-bg">
@@ -131,11 +132,10 @@
               </div>
             </div>          
           `
-                attractionsGroup.appendChild(attraction);
-              });
-              nextPage = responseJson["nextPage"]
-              // console.log(count)
-            }
+              attractionsGroup.appendChild(attraction);
+            });
+            nextPage = responseJson["nextPage"]
+
           }
 
         })
@@ -155,25 +155,9 @@
             mrt.innerHTML =
               `<div class="itemText" onclick="mrtAttractions('${mrtList[i]}')">${mrtList[i]}</div>`
             listItemContainer.appendChild(mrt);
-            mrtDict[mrtList[i]] = i;
           };
         })
         .catch(error => console.error("Error:", error))
-    }
-
-    function mrtBars(start) {
-
-      while (listItemContainer.firstChild) {
-        listItemContainer.removeChild(listItemContainer.lastChild);
-      }
-
-      for (i = start; i < mrtList.length; i++) {
-        const mrt = document.createElement("div");
-        mrt.classList.add("listItem");
-        mrt.innerHTML =
-          `<div class="itemText" onclick="mrtAttractions('${mrtList[i]}')">${mrtList[i]}</div>`
-        listItemContainer.appendChild(mrt);
-      };
     }
 
     function search() {
@@ -210,7 +194,7 @@
     let nextPage = 0
     let count = {}
     let mrtList = []
-    let mrtDict = {}
+
     const attractionsGroup = document.getElementsByClassName("attractions-group")[0]
     const listItemContainer = document.getElementsByClassName("listItem-container")[0]
     const rightArrow = document.getElementsByClassName("right-container")[0]
@@ -223,38 +207,23 @@
 
     rightArrow.addEventListener('click', () => {
       const firstMrt = listItemContainer.firstElementChild.innerText
-      let start = mrtDict[firstMrt]
 
-      if (document.body.clientWidth > 360) {
-        if (start === 0) {
-          start = 14;
-        } else {
-          start = 19;
-        }
+      if (document.body.clientWidth > 1200) {
+        listItemContainer.scrollLeft += 1050;
       } else {
-        start += 2;
-        if (start + 2 > mrtList.length - 1) { start = mrtList.length - 2; }
+        listItemContainer.scrollLeft += 200;
       }
-
-      return mrtBars(start)
     })
 
     leftArrow.addEventListener('click', () => {
       const firstMrt = listItemContainer.firstElementChild.innerText
-      let start = mrtDict[firstMrt]
 
-      if (document.body.clientWidth > 360) {
-        if (start === 19) {
-          start = 5;
-        } else {
-          start = 0;
-        }
+      if (document.body.clientWidth > 1200) {
+        listItemContainer.scrollLeft -= 1000;
       } else {
-        start -= 2;
-        if (start < 0) { start = 0; }
+        listItemContainer.scrollLeft -= 200;
       }
 
-      return mrtBars(start)
     })
 
   </script>
