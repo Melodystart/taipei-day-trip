@@ -101,17 +101,24 @@
   .hero-section {
     width: 1920px;
     height: 320px;
-    background: linear-gradient(135deg, #AADDEE 0%, #66AABB 100%);
-
     display: flex;
     justify-content: center;
     align-items: center;
-    /* position: relative; */
+    position: relative;
+    overflow: hidden;
   }
 
   img {
     object-fit: cover;
     /* 填滿元素的寬度及高度(維持原比例)，超出的部分會被裁切 */
+  }
+
+  .welcome-picture {
+    width: 1920px;
+    height: 480px;
+    top: 0;
+    left: 0;
+    position: absolute;
   }
 
   .slogan {
@@ -145,7 +152,6 @@
     text-align: left;
 
     color: #F8F8F8;
-    box-shadow: 0px 0px 30px 0px #AABBCC;
   }
 
   .slogan-sub {
@@ -291,12 +297,14 @@
   }
 
   .listItem {
+    /* min-width: 62px; */
     height: 24px;
     padding: 5px 15px 5px 15px;
     gap: 4px;
   }
 
   .itemText {
+    /* min-width: 32px; */
     height: 14px;
 
     font-family: 'Noto Sans TC', sans-serif;
@@ -447,10 +455,501 @@
   footer {
     width: 1920px;
     height: 104px;
-    padding: 40px 843px 40px 843px;
+    padding: 0 843px;
     background: #757575;
     display: flex;
     align-items: center;
+    bottom: 0;
+  }
+
+  .copyright-container {
+    width: 234px;
+    height: 24px;
+    padding: 5px 0px 5px 0px;
+    position: absolute;
+  }
+
+  .copyright {
+    width: 234px;
+    height: 14px;
+    top: 5px;
+    position: relative;
+    display: block;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+
+    color: #FFFFFF;
+  }
+}
+
+@media screen and (max-width:360px) {
+
+  html,
+  body {
+    margin: 0;
+    width: 360px;
+  }
+
+  .navigation {
+    width: 360px;
+    height: 54px;
+    background: #FFFFFF;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+  }
+
+  .nav-container {
+    width: 360px;
+    height: 54px;
+    position: relative;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .nav-text {
+    width: 150px;
+    height: 34px;
+    top: 10px;
+    left: 10px;
+    position: absolute;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 34px;
+    letter-spacing: 0em;
+    text-align: left;
+
+    color: #448899;
+  }
+
+  .frame2 {
+    width: 175px;
+    height: 34px;
+    top: 10px;
+    left: 185px;
+    position: absolute;
+  }
+
+  .frame1 {
+    width: 175px;
+    height: 34px;
+
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .nav-button1 {
+    width: 84px;
+    height: 34px;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+  }
+
+  .nav-button2 {
+    width: 91px;
+    height: 34px;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    left: 84px;
+    position: absolute;
+  }
+
+  .nav-button1-text {
+    width: 64px;
+    height: 14px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #666666;
+  }
+
+  .nav-button2-text {
+    width: 71px;
+    height: 14px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #666666;
+  }
+
+  .hero-section {
+    width: 360px;
+    height: 320px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  img {
+    object-fit: cover;
+    /* 填滿元素的寬度及高度(維持原比例)，超出的部分會被裁切 */
+  }
+
+  .welcome-picture {
+    width: 1283px;
+    height: 320px;
+    top: 0;
+    left: 0;
+    position: absolute;
+  }
+
+  .slogan {
+    width: 340px;
+    height: 169px;
+    padding: 10px;
+    gap: 10px;
+    display: flex;
+  }
+
+  .container {
+    width: 320px;
+    height: 149px;
+    padding: 10px;
+    gap: 25px;
+    display: flex;
+    position: relative;
+  }
+
+  .slogan-container {
+    width: 320px;
+    height: 78px;
+    padding: 10px 0 0 0;
+  }
+
+  .slogan-main {
+    width: 320px;
+    height: 41px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0em;
+    text-align: left;
+
+    color: #F8F8F8;
+  }
+
+  .slogan-sub {
+    width: 320px;
+    height: 22px;
+    top: 76px;
+    position: absolute;
+    /*此處top: 56px;、position: absolute;
+        和.banner-container的position: relative;是一組*/
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #F8F8F8;
+  }
+
+  .search {
+    width: 285px;
+    height: 46px;
+    top: 118px;
+    position: absolute;
+  }
+
+  .search-bar {
+    width: 225px;
+    height: 46px;
+  }
+
+  .search-input {
+    width: 225px;
+    height: 46px;
+    display: flex;
+    box-shadow: 0px 0px 20px 0px #AABBCC;
+  }
+
+  .search-input-border {
+    width: 230px;
+    height: 46px;
+    background: #FFFFFF;
+    border-radius: 4px 0 0 4px;
+    position: relative;
+    /* box-shadow: 0px 0px 20px 0px #AABBCC; */
+  }
+
+  .search-input-text {
+    width: 195px;
+    height: 16px;
+    top: 15px;
+    left: 15px;
+    position: absolute;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+    border: none;
+    outline: none;
+    color: #757575;
+  }
+
+  .search-btn {
+    width: 60px;
+    height: 46px;
+    left: 225px;
+  }
+
+  .search-btn-bg {
+    width: 60px;
+    height: 46px;
+    background: #448899;
+    border-radius: 0 4px 4px 0;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .search-btn-icon {
+    width: 30px;
+    height: 30px;
+    top: 8px;
+    left: 15px;
+    position: absolute;
+  }
+
+  main {
+    width: 360px;
+    min-height: 715px;
+    padding: 40px 0px 0px 0px;
+  }
+
+  .main-container {
+    width: 360px;
+    min-height: 715px;
+  }
+
+  .list-bar {
+    width: 360px;
+    height: 70px;
+    padding: 0px 0px 20px 0px;
+    color: #FFFFFF;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .left-container {
+    width: 47px;
+    height: 50px;
+    padding: 9px 0px 9px 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .button-arrow {
+    width: 32px;
+    height: 32px;
+  }
+
+  .middle-container {
+    width: 266px;
+    height: 50px;
+    padding: 13px 10px 13px 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .listItem-container {
+    width: 246px;
+    height: 24px;
+    overflow: hidden;
+    /*自動隱藏超出的文字或圖片*/
+    white-space: nowrap;
+    /*空白字元強制不換行*/
+    display: flex;
+    align-items: center;
+  }
+
+  .listItem {
+    /* min-width: 62px; */
+    height: 24px;
+    padding: 5px 15px 5px 15px;
+    gap: 4px;
+  }
+
+  .itemText {
+    /* min-width: 32px; */
+    height: 14px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    color: #666666;
+    z-index: 88;
+    cursor: pointer;
+  }
+
+  .right-container {
+    width: 47px;
+    height: 50px;
+    padding: 9px 15px 9px 0px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .attractions {
+    width: 352px;
+    min-height: 605px;
+    padding: 0px 4px;
+  }
+
+  .attractions-group {
+    width: 352px;
+    min-height: 605px;
+    display: block;
+    /* position: absolute; 若加上會使偵測scroll失效，後續研究一下position */
+  }
+
+  .attraction {
+    width: 322px;
+    height: 280px;
+    border-radius: 5px;
+    margin: 15px;
+
+    border: 1px solid #E8E8E8;
+    position: relative;
+  }
+
+  .details-bottom {
+    width: 322px;
+    height: 45px;
+    top: 235px;
+    gap: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+
+    background: #FFFFFF;
+    border-radius: 0 0 5px 5px;
+  }
+
+  .details-info {
+    width: 301px;
+    height: 25px;
+    display: flex;
+    position: relative;
+  }
+
+  .mrt {
+    width: 150px;
+    height: 25px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #757575;
+
+    display: flex;
+    align-items: center;
+  }
+
+  .category {
+    width: 150px;
+    height: 25px;
+    left: 151px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    color: #757575;
+
+    display: flex;
+    align-items: center;
+    position: absolute;
+    justify-content: right;
+  }
+
+  .details-middle {
+    width: 322px;
+    height: 40px;
+    top: 195px;
+    gap: 4px;
+    position: absolute;
+  }
+
+  .name-bg {
+    width: 322px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    position: relative;
+  }
+
+  .name-info {
+    width: 302px;
+    height: 20px;
+    top: 10px;
+    left: 10px;
+    position: absolute;
+  }
+
+  .name {
+    width: 302px;
+    height: 20px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+
+    color: #FFFFFF;
+  }
+
+  .attraction-img {
+    width: 322px;
+    height: 235px;
+    border-radius: 5px 5px 0 0;
+  }
+
+  footer {
+    width: 360px;
+    height: 104px;
+    padding: 0;
+    background: #757575;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     bottom: 0;
   }
 

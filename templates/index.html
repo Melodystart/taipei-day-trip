@@ -27,7 +27,7 @@
     </div>
   </nav>
   <div class="hero-section">
-    <img src="/picture/desktop/taipei101.png">
+    <img class="welcome-picture" src="/picture/taipei101.png">
     <div class="slogan">
       <div class="container">
         <div class="slogan-container">
@@ -220,26 +220,40 @@
     getMrts(0);
     search();
 
-    
+
     rightArrow.addEventListener('click', () => {
       const firstMrt = listItemContainer.firstElementChild.innerText
       let start = mrtDict[firstMrt]
-      if (start === 0) {
-        start = 14;
+
+      if (document.body.clientWidth > 360) {
+        if (start === 0) {
+          start = 14;
+        } else {
+          start = 17;
+        }
       } else {
-        start = 17
+        start += 2;
+        if (start + 2 > mrtList.length - 1) { start = mrtList.length - 4; }
       }
+
       return mrtBars(start)
     })
 
     leftArrow.addEventListener('click', () => {
       const firstMrt = listItemContainer.firstElementChild.innerText
       let start = mrtDict[firstMrt]
-      if (start === 17) {
-        start = 5;
+
+      if (document.body.clientWidth > 360) {
+        if (start === 17) {
+          start = 5;
+        } else {
+          start = 0;
+        }
       } else {
-        start = 0
+        start -= 2;
+        if (start < 0) { start = 0; }
       }
+
       return mrtBars(start)
     })
 
