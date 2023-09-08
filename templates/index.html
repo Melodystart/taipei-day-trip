@@ -48,7 +48,7 @@
             <div class="search-btn">
               <div class="search-btn-bg" onclick="search()">
                 <div class="search-btn-icon">
-                  <img src="/picture/desktop/search.png" width="30" height="30">
+                  <img src="/picture/search.png" width="30" height="30">
                 </div>
               </div>
             </div>
@@ -62,7 +62,7 @@
       <div class="list-bar">
         <div class="left-container">
           <div class="button-arrow">
-            <img src="/picture/desktop/arrow-left.png" width="32" height="32">
+            <img src="/picture/arrow-left.png" width="32" height="32">
           </div>
         </div>
         <div class="middle-container">
@@ -72,7 +72,7 @@
         </div>
         <div class="right-container">
           <div class="button-arrow">
-            <img src="/picture/desktop/arrow-right.png" width="32" height="32">
+            <img src="/picture/arrow-right.png" width="32" height="32">
           </div>
         </div>
       </div>
@@ -162,6 +162,7 @@
 
     function search() {
       count = {}
+      nextPage = 0
 
       while (attractionsGroup.firstChild) {
         attractionsGroup.removeChild(attractionsGroup.lastChild);
@@ -209,7 +210,9 @@
       const firstMrt = listItemContainer.firstElementChild.innerText
 
       if (document.body.clientWidth > 1200) {
-        listItemContainer.scrollLeft += 1050;
+        listItemContainer.scrollLeft += 1000;
+      } else if (document.body.clientWidth > 830) {
+        listItemContainer.scrollLeft += 650;
       } else {
         listItemContainer.scrollLeft += 200;
       }
@@ -220,6 +223,8 @@
 
       if (document.body.clientWidth > 1200) {
         listItemContainer.scrollLeft -= 1000;
+      } else if (document.body.clientWidth > 830) {
+        listItemContainer.scrollLeft -= 650;
       } else {
         listItemContainer.scrollLeft -= 200;
       }

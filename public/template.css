@@ -178,7 +178,7 @@
     height: 46px;
     top: 103px;
     position: absolute;
-    padding: 0px 720px 0px 0px;
+    /* padding: 0px 720px 0px 0px; */
   }
 
   .search-bar {
@@ -490,7 +490,264 @@
   }
 }
 
-@media screen and (max-width:1200px) and (min-width:360px) {
+@media screen and (max-width:1200px) {
+
+  .nav-container {
+    width: 736px;
+    height: 54px;
+    position: relative;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .frame2 {
+    width: 175px;
+    height: 34px;
+    display: flex;
+    justify-content: space-between;
+    right: 0px;
+    position: absolute;
+  }
+
+  .nav-button2 {
+    width: 91px;
+    height: 34px;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0 10px 10px;
+    left: 84px;
+    position: absolute;
+  }
+
+  .slogan {
+    width: 736px;
+    height: 169px;
+    padding: 10px;
+    gap: 10px;
+    display: flex;
+  }
+
+  .container {
+    width: 716px;
+    height: 149px;
+    padding: 10px;
+    gap: 25px;
+    display: flex;
+    position: relative;
+  }
+
+  .slogan-container {
+    width: 716px;
+    height: 78px;
+    padding: 10px 0 0 0;
+  }
+
+
+  .slogan-main {
+    width: 320px;
+    height: 41px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0em;
+    text-align: left;
+
+    color: #F8F8F8;
+  }
+
+  .slogan-sub {
+    width: 320px;
+    height: 22px;
+    top: 76px;
+    position: absolute;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #F8F8F8;
+  }
+
+  .search {
+    width: 716px;
+    height: 46px;
+    top: 118px;
+    position: absolute;
+  }
+
+  main {
+    min-height: 715px;
+    padding: 40px 0px 0px 0px;
+  }
+
+  .main-container {
+    width: 736px;
+    min-height: 715px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .list-bar {
+    width: 736px;
+    height: 70px;
+    padding: 0px 0px 20px 0px;
+    color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+  }
+
+  .middle-container {
+    width: 736px;
+    height: 50px;
+    padding: 13px 0px;
+    display: flex;
+    align-items: center;
+  }
+
+  .listItem-container {
+    height: 24px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
+
+  .attractions {
+    width: 736px;
+    min-height: 605px;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .attractions-group {
+    width: 736px;
+    min-height: 786px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    /* grid-gap: 10px; */
+  }
+
+  .attraction {
+    width: 322px;
+    height: 280px;
+    border-radius: 5px;
+    margin: 15px;
+
+    border: 1px solid #E8E8E8;
+    position: relative;
+  }
+
+  .details-bottom {
+    width: 322px;
+    height: 45px;
+    top: 235px;
+    gap: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+
+    background: #FFFFFF;
+    border-radius: 0 0 5px 5px;
+  }
+
+  .details-info {
+    width: 301px;
+    height: 25px;
+    display: flex;
+    position: relative;
+  }
+
+  .mrt {
+    width: 150px;
+    height: 25px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #757575;
+
+    display: flex;
+    align-items: center;
+  }
+
+  .category {
+    width: 150px;
+    height: 25px;
+    left: 151px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    color: #757575;
+
+    display: flex;
+    align-items: center;
+    position: absolute;
+    justify-content: right;
+  }
+
+  .details-middle {
+    width: 322px;
+    height: 40px;
+    top: 195px;
+    gap: 4px;
+    position: absolute;
+  }
+
+  .name-bg {
+    width: 322px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    position: relative;
+  }
+
+  .name-info {
+    width: 302px;
+    height: 20px;
+    top: 10px;
+    left: 10px;
+    position: absolute;
+  }
+
+  .name {
+    width: 302px;
+    height: 20px;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+
+    color: #FFFFFF;
+  }
+
+  .attraction-img {
+    width: 322px;
+    height: 235px;
+    border-radius: 5px 5px 0 0;
+  }
+
+}
+
+
+@media screen and (max-width:830px) and (min-width:360px) {
 
   html,
   body {
