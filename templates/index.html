@@ -155,7 +155,10 @@
             mrt.innerHTML =
               `<div class="itemText" onclick="mrtAttractions('${mrtList[i]}')">${mrtList[i]}</div>`
             listItemContainer.appendChild(mrt);
+            scrollMax += mrt.offsetWidth;
           };
+          scrollMax -= listItemContainer.clientWidth;
+          // console.log(scrollMax)
         })
         .catch(error => console.error("Error:", error))
     }
@@ -200,33 +203,53 @@
     const listItemContainer = document.getElementsByClassName("listItem-container")[0]
     const rightArrow = document.getElementsByClassName("right-container")[0]
     const leftArrow = document.getElementsByClassName("left-container")[0]
-
+    let scrollAmount = 0;
+    let scrollMin = 0;
+    let scrollMax = 0;
 
     getMrts(0);
     search();
 
 
     rightArrow.addEventListener('click', () => {
-      const firstMrt = listItemContainer.firstElementChild.innerText
+      function scrollRight(distance) {
+
+        listItemContainer.scrollTo({
+          top: 0,
+          left: Math.min(scrollAmount += distance, scrollMax),
+          behavior: 'smooth'
+        });
+        if (scrollAmount > scrollMax) { scrollAmount = scrollMax }
+
+      }
 
       if (document.body.clientWidth > 1200) {
-        listItemContainer.scrollLeft += 1000;
+        scrollRight(1000);
       } else if (document.body.clientWidth > 830) {
-        listItemContainer.scrollLeft += 650;
+        scrollRight(650);
       } else {
-        listItemContainer.scrollLeft += 200;
+        scrollRight(200);
       }
     })
 
     leftArrow.addEventListener('click', () => {
-      const firstMrt = listItemContainer.firstElementChild.innerText
+      function scrollLeft(distance) {
+
+        listItemContainer.scrollTo({
+          top: 0,
+          left: Math.max(scrollAmount -= distance, scrollMin),
+          behavior: 'smooth'
+        });
+        if (scrollAmount < scrollMin) { scrollAmount = scrollMin }
+
+      }
 
       if (document.body.clientWidth > 1200) {
-        listItemContainer.scrollLeft -= 1000;
+        scrollLeft(1000);
       } else if (document.body.clientWidth > 830) {
-        listItemContainer.scrollLeft -= 650;
+        scrollLeft(650);
       } else {
-        listItemContainer.scrollLeft -= 200;
+        scrollLeft(200);
       }
 
     })
