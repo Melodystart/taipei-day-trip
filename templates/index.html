@@ -94,15 +94,13 @@
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          console.log('我進來了，先取消觀察')
-          intersectionObserver.unobserve(
+
+          intersectionObserver.unobserve(  //若有observe到目標(footer)，先取消觀察，再fetch API
             document.querySelector('footer')
           );
           if (nextPage !== null) {  // 有nexPage才呼叫API
             getPage(nextPage)
           }
-        } else {
-          console.log('我出去了')
         }
       }
     );
@@ -152,12 +150,13 @@
               attractionsGroup.appendChild(attraction);
             });
             nextPage = responseJson["nextPage"]
-            console.log(url)
+
           }
-          intersectionObserver.observe(
+
+          intersectionObserver.observe(        //fetch好了, 恢復觀察
             document.querySelector('footer')
           );
-          console.log('fetch好了, 恢復觀察')
+
         })
         .catch(error => console.error("Error:", error))
     }
