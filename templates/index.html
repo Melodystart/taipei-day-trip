@@ -90,18 +90,35 @@
   </footer>
 
   <script>
+
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          console.log('我進來了，先取消觀察')
+          intersectionObserver.unobserve(
+            document.querySelector('footer')
+          );
+          if (nextPage !== null) {  // 有nexPage才呼叫API
+            getPage(nextPage)
+          }
+        } else {
+          console.log('我出去了')
+        }
+      }
+    );
+
     function getPage(page) {
 
       const keyword = document.querySelector(".search-input-text").value
 
       url = '/api/attractions?page=' + page + '&keyword=' + keyword
 
-      if (count[page]) {  //若該頁數已呼叫過API，則僅計次數且不再重複呼叫API增加景點
-        count[page] += 1;
-        return
-      } else {
-        count[page] = 1;
-      }
+      // if (count[page]) {  //原先阻止重複呼叫API方法：若該page已叫過API，則僅計次數不再重複呼叫API
+      //   count[page] += 1;
+      //   return
+      // } else {
+      //   count[page] = 1;
+      // }
 
       fetch(url, { method: 'get' })
         .then(response => response.json())
@@ -135,9 +152,12 @@
               attractionsGroup.appendChild(attraction);
             });
             nextPage = responseJson["nextPage"]
-
+            console.log(url)
           }
-
+          intersectionObserver.observe(
+            document.querySelector('footer')
+          );
+          console.log('fetch好了, 恢復觀察')
         })
         .catch(error => console.error("Error:", error))
     }
@@ -173,19 +193,6 @@
 
       getPage(0)
 
-      const intersectionObserver = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) {
-            if (nextPage !== null) {  // 有nexPage才呼叫API
-              getPage(nextPage)
-            }
-          }
-        }
-      );
-
-      intersectionObserver.observe(
-        document.querySelector('footer')
-      );
     }
 
     function mrtAttractions(mrt) {
