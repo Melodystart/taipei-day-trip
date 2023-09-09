@@ -42,22 +42,16 @@ def getPage():
 		cursor = con.cursor()
 
 		if keyword == None:       #沒有給定關鍵字則不做篩選
-			sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id LIMIT %s, 12"
+			sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id LIMIT %s, 13"
 
 			cursor.execute(sql,(page*12,))
 			data = cursor.fetchall()
-
-			cursor.execute(sql,(page*12+12,))
-			nextData = cursor.fetchall()
 			
 		else:
-			sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE name LIKE %s OR mrt =%s LIMIT %s, 12"	
+			sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE name LIKE %s OR mrt =%s LIMIT %s, 13"	
 
 			cursor.execute(sql,("%"+ keyword +"%", keyword, page*12))
 			data = cursor.fetchall()
-
-			cursor.execute(sql,("%"+ keyword +"%", keyword, page*12+12))
-			nextData = cursor.fetchall()
 
 			if (len(data) == 0) & (page == 0):
 				result["error"] = True
@@ -72,9 +66,11 @@ def getPage():
 			result["message"] = "page輸入非資料有效範圍內"
 			return result, 500
 
-		nextPage = page + 1
-		if len(nextData) == 0: 
-			nextPage = None
+		if len(data) == 13:          #抓取資料為13筆，即下頁還有資料
+			data.pop()                 #一頁為12筆，故去掉最後一個第13筆                    
+			nextPage = page + 1
+		else:
+			nextPage = None            #抓取資料未達13筆，即下頁無資料
 
 		result["nextPage"] = nextPage
 		result["data"] = []
