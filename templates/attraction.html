@@ -9,13 +9,13 @@
 </head>
 
 <body>
-  <!-- <div class="attraction-container"> -->
-
   <nav class="navigation">
-    <div class="nav-container">
-      <span class="nav-text">
-        台北一日遊
-      </span>
+    <div class=" nav-container">
+      <a href="/" style="text-decoration:none;">
+        <span class=" nav-text">
+          台北一日遊
+        </span>
+      </a>
       <div class="frame2">
         <div class="frame1">
           <div class="nav-button1">
@@ -32,33 +32,30 @@
   <div class="separator-nav">
   </div>
 
-  <!-- <div class="attraction-inner-section"> -->
   <div class="attraction-section">
+
     <div class="profile-picture">
 
-      <img src="https://www.travel.taipei/d_upload_ttn/sceneadmin/pic/11000848.jpg" class="profile-img">
+      <img src="" class="profile-img">
 
       <div class="attraction-button">
-        <img src="/picture/attraction-arrow-left.png" width="36" height="36">
-        <img src="/picture/attraction-arrow-right.png" width="36" height="36">
+        <img class="img-left" src="/picture/attraction-arrow-left.png">
+        <img class="img-right" src="/picture/attraction-arrow-right.png">
       </div>
 
       <div class="attraction-circle">
 
         <img class="circle-current" src="/picture/circle-current.png">
-        <img class="circle" src="/picture/circle.png">
-        <img class="circle" src="/picture/circle.png">
+        <!-- <img class="circle" src="/picture/circle.png"> -->
 
       </div>
     </div>
 
     <div class="profile">
       <div class="profile-name">
-        平安鐘
       </div>
 
       <div class="profile-category">
-        公共藝術 at 忠孝復興
       </div>
 
       <div class="booking-form">
@@ -78,19 +75,19 @@
         </div>
         <div class="booking-time">
           <span class="booking-time-title">選擇時間：</span>
-          <div class="booking-time-left">
-            <div class="day-btn">
+          <div class="booking-time-am">
+            <div class="day-button-am">
               <img class="day-outline" src="/picture/day-outline.png">
-              <img class="day-btn" src="/picture/day-btn.png">
+              <img class="day-core" src="/picture/day-btn.png">
             </div>
             <div class="day-text">
               上半天
             </div>
           </div>
-          <div class="booking-time-right">
-            <div class="day-btn">
+          <div class="booking-time-pm">
+            <div class="day-button-pm">
               <img class="day-outline" src="/picture/day-outline.png">
-              <!-- <img class="day-btn" src="/picture/day-btn.png"> -->
+              <!-- <img class="day-core" src="/picture/day-btn.png"> -->
             </div>
             <div class="day-text">
               下半天
@@ -105,28 +102,21 @@
           <span class="booking-button-text">開始預約行程</span>
         </div>
       </div>
+
     </div>
 
-    <div class="separator-main">
+  </div>
+  <div class="separator-main">
+  </div>
+  <div class="info">
+    <div class="description">
     </div>
-
-    <div class="info">
-      <div class="introduction">
-        平安鐘祈求大家的平安，這是為了紀念921地震週年的設計，在喧鬧的廣場上每個小時鳴鐘，保佑平安，祈禱臺灣不會再發生這樣的天災。雙手合十加上108個黃色的琉璃乳丁，隨著緩緩流下的水，在底下的一個小噴泉噴出。雙手合十的意義，一個是祈福，一個是包容，教我們要包容這樣的改變，撫平這樣的傷口。下面的水緩緩流出，代表著人的生命力是不斷地延續下去。緩緩地鐘聲，卻帶來心中的寧靜。
-        這個平安鐘是由建築師姚仁喜與琉璃創作家王俠軍共同設計，長6公尺、寬5公尺，以鑄銅製成，由法鼓山文教基金會全額出資。平安鐘點綴都市景觀，不時提醒大家，面對刻骨銘心的災難痛苦，更應該有謙卑的一顆心。
-      </div>
-      <div class="address-title">景點地址：</div>
-      <div class="address">臺北市 大安區忠孝東路4段</div>
-      <div class="traffic-title">交通方式：</div>
-      <div class="traffic">
-        捷運站名：忠孝復興站4號出口1.公車：204、212、212直、232、232副、262、262(區間)、278、299、521、605、605(副)、605(新台五線)、667、903、忠孝新幹線至頂好市場站
-        2.車位：太平洋崇光百貨地下停車場或市民大道附近地下停車場</div>
-    </div>
-
-    <!-- </div> -->
+    <div class="address-title">景點地址：</div>
+    <div class="address"></div>
+    <div class="transport-title">交通方式：</div>
+    <div class="transport"></div>
   </div>
 
-  <!-- </div> -->
   <footer class="attraction-footer">
     <div class="copyright-container">
       <span class="copyright">COPYRIGHT © 2021 台北一日遊</span>
@@ -134,6 +124,127 @@
   </footer>
 
   <script>
+
+    function fetchAPI(id) {
+
+      url = '/api/attraction/' + id
+
+      const data = fetch(url, { method: 'get' })
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson["error"]) {
+            window.location.href = '/'
+          } else {
+            return responseJson["data"]
+          }
+
+        })
+        .catch(error => window.location.href = '/')
+
+      return data
+    }
+
+    function getAttraction(data) {
+
+      document.querySelector(".profile-img").src = data["images"][imgIndex]
+
+      for (let i = 0; i < data["images"].length - 1; i++) {
+        const circle = document.createElement("img");
+        circle.classList.add("circle");
+        circle.src = "/picture/circle.png";
+        circleCounts.appendChild(circle);
+        console.log(i)
+      }
+
+      document.querySelector(".profile-name").textContent = data["name"]
+      document.querySelector(".address").textContent = data["address"]
+      document.querySelector(".profile-category").textContent = data["category"] + " at " + data["mrt"]
+      document.querySelector(".description").textContent = data["description"]
+      document.querySelector(".transport").textContent = data["transport"]
+
+    }
+
+    const originUrl = location.href;
+    const index = originUrl.search('attraction/') + 11;
+    const id = Number(originUrl.slice(index));
+
+    const am = document.querySelector(".day-button-am");
+    const pm = document.querySelector(".day-button-pm");
+
+    const circleCounts = document.querySelector(".attraction-circle");
+    const imgRight = document.querySelector(".img-right");
+    const imgLeft = document.querySelector(".img-left");
+    let imgIndex = 0;
+
+    // fetch該頁資料存到參數data，再去做後續渲染畫面及DOM監聽
+    const data = fetchAPI(id);
+
+    data
+      .then(data => {
+
+        getAttraction(data);
+
+        am.addEventListener('click', () => {
+          const amSelect = am.querySelector('.day-core');
+          const pmSelect = pm.querySelector('.day-core');
+
+          if (!amSelect) {
+            const select = document.createElement("img");
+            select.classList.add("day-core");
+            select.src = "/picture/day-btn.png";
+            am.appendChild(select);
+            pmSelect.remove();
+            document.querySelector(".booking-price-amount").textContent = '新台幣 2000 元';
+          }
+
+        })
+
+        pm.addEventListener('click', () => {
+          const amSelect = am.querySelector('.day-core');
+          const pmSelect = pm.querySelector('.day-core');
+
+          if (!pmSelect) {
+            const select = document.createElement("img");
+            select.classList.add("day-core");
+            select.src = "/picture/day-btn.png";
+            pm.appendChild(select);
+            amSelect.remove();
+            document.querySelector(".booking-price-amount").textContent = '新台幣 2500 元';
+          }
+        })
+
+        imgRight.addEventListener('click', () => {
+
+          if (imgIndex < data["images"].length - 1) {
+            imgIndex += 1;
+            document.querySelector(".profile-img").src = data["images"][imgIndex];
+
+            const circle = document.createElement("img");
+            circle.classList.add("circle");
+            circle.src = "/picture/circle.png";
+            circleCounts.insertBefore(circle, circleCounts.firstChild);
+            circleCounts.lastChild.remove();
+          }
+
+        })
+
+        imgLeft.addEventListener('click', () => {
+
+          if (imgIndex > 0) {
+            imgIndex -= 1;
+            document.querySelector(".profile-img").src = data["images"][imgIndex];
+
+            const circle = document.createElement("img");
+            circle.classList.add("circle");
+            circle.src = "/picture/circle.png";
+            circleCounts.appendChild(circle);
+            circleCounts.firstChild.remove();
+          }
+
+        })
+
+      })
+      .catch(error => window.location.href = '/')
 
   </script>
 </body>

@@ -11,9 +11,11 @@
 <body>
   <nav class="navigation">
     <div class="nav-container">
-      <span class="nav-text">
-        台北一日遊
-      </span>
+      <a href="/" style="text-decoration:none;">
+        <span class="nav-text">
+          台北一日遊
+        </span>
+      </a>
       <div class="frame2">
         <div class="frame1">
           <div class="nav-button1">
@@ -132,6 +134,7 @@
               attraction.classList.add("attraction");
               attraction.innerHTML =
                 `
+            <a href="/attraction/${item["id"]}">
             <img class="attraction-img" src="${item["images"][0]}" width="270" height="197">
             <div class="details-middle">
               <div class="name-bg">

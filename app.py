@@ -105,6 +105,7 @@ def getAttraction(attractionId):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
+		cursor.execute("SET SESSION group_concat_max_len = 1000000;")
 		sql = "SELECT main.*, newimage.imagescombined FROM main LEFT JOIN (SELECT image.attraction_id, GROUP_CONCAT(image.images) AS imagescombined FROM image GROUP BY image.attraction_id) newimage ON main.id = newimage.attraction_id WHERE id =%s"	
 
 		cursor.execute(sql,(attractionId,))
