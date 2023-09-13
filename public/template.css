@@ -489,7 +489,8 @@
 
   .separator-nav {
     top: 54px;
-    border: 1px solid #E8E8E8;
+    height: 1px;
+    background-color: #E8E8E8;
   }
 
   .attraction-section {
@@ -868,10 +869,10 @@
 
   .separator-main {
     width: 1200px;
-    border: 1px;
     margin: 0 auto;
-
-    border: 1px solid #E8E8E8;
+    height: 1px;
+    background-color: #E8E8E8;
+    /* border: 1px solid #E8E8E8; */
   }
 
   .info {
@@ -1251,7 +1252,7 @@
     justify-content: center;
     align-items: end;
     padding: 0;
-    /* margin: 0 auto; */
+    margin: 0 auto;
   }
 
   .profile-img {
@@ -1299,6 +1300,7 @@
     height: 400px;
     position: relative;
     padding: 0;
+    margin: 0 0 0 10px;
   }
 
   .profile-name {
@@ -1609,8 +1611,8 @@
     width: 100%;
     border: 1px;
     margin: 0 auto;
-
-    border: 1px solid #E8E8E8;
+    height: 1px;
+    background-color: #E8E8E8;
   }
 
   .info {
@@ -2204,7 +2206,8 @@
 
   .separator-nav {
     top: 54px;
-    border: 1px solid #E8E8E8;
+    height: 1px;
+    background-color: #E8E8E8;
   }
 
   .attraction-section {
@@ -2592,7 +2595,8 @@
     left: 0;
     margin: 40px auto;
 
-    border: 1px solid #E8E8E8;
+    height: 1px;
+    background-color: #E8E8E8;
   }
 
   .info {

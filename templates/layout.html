@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taipei Trip 台北一日遊</title>
+  {% block css %}{% endblock %}
+</head>
+
+<body>
+
+  <nav class="navigation">
+    <div class="nav-container">
+      <a href="/" style="text-decoration:none;">
+        <span class="nav-text">
+          台北一日遊
+        </span>
+      </a>
+      <div class="frame2">
+        <div class="frame1">
+          <div class="nav-button1">
+            <span class="nav-button1-text">預定行程</span>
+          </div>
+          <div class="nav-button2">
+            <span class="nav-button2-text">登入/註冊</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {% block main %}{% endblock %}
+
+  <footer class="attraction-footer">
+    <div class="copyright-container">
+      <span class="copyright">COPYRIGHT © 2021 台北一日遊</span>
+    </div>
+  </footer>
+
+  {% block js %}{% endblock %}
+
+</body>
+
+</html>
