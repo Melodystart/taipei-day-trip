@@ -1,0 +1,223 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="../template.css">
+{% endblock %}
+
+{% block main %}
+<div class="separator-nav">
+</div>
+
+<div class="attraction-section">
+
+  <div class="profile-picture">
+
+    <img src="" class="profile-img">
+
+    <div class="attraction-button">
+      <img class="img-left" src="/picture/attraction-arrow-left.png">
+      <img class="img-right" src="/picture/attraction-arrow-right.png">
+    </div>
+
+    <div class="attraction-circle">
+
+      <img class="circle-current" src="/picture/circle-current.png">
+      <!-- <img class="circle" src="/picture/circle.png"> -->
+
+    </div>
+  </div>
+
+  <div class="profile">
+    <div class="profile-name">
+    </div>
+
+    <div class="profile-category">
+    </div>
+
+    <div class="booking-form">
+      <div class="booking-title">
+        訂購導覽行程
+      </div>
+      <div class="booking-sub">
+        以此景點為中心的一日行程，帶您探索城市角落故事
+      </div>
+      <div class="booking-date">
+        <span class="booking-date-title">選擇日期：</span>
+        <div class="booking-date-container">
+          <!-- <input type="date" class="date" name="date" placeholder="yyyy/mm/dd"> -->
+          <input type="text" class="date" placeholder="yyyy/mm/dd" onfocus="(this.type='date')">
+          <span class="calendar"></sapn>
+        </div>
+      </div>
+      <div class="booking-time">
+        <span class="booking-time-title">選擇時間：</span>
+        <div class="booking-time-am">
+          <div class="day-button-am">
+            <img class="day-outline" src="/picture/day-outline.png">
+            <img class="day-core" src="/picture/day-btn.png">
+          </div>
+          <div class="day-text">
+            上半天
+          </div>
+        </div>
+        <div class="booking-time-pm">
+          <div class="day-button-pm">
+            <img class="day-outline" src="/picture/day-outline.png">
+            <!-- <img class="day-core" src="/picture/day-btn.png"> -->
+          </div>
+          <div class="day-text">
+            下半天
+          </div>
+        </div>
+      </div>
+      <div class="booking-price">
+        <div class="booking-price-title">導覽費用：</div>
+        <div class="booking-price-amount">新台幣 2000 元</div>
+      </div>
+      <div class="booking-button">
+        <span class="booking-button-text">開始預約行程</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="separator-main">
+</div>
+
+<div class="info">
+  <div class="description">
+  </div>
+  <div class="address-title">景點地址：</div>
+  <div class="address"></div>
+  <div class="transport-title">交通方式：</div>
+  <div class="transport"></div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+
+  function fetchAPI(id) {
+
+    url = '/api/attraction/' + id
+
+    const data = fetch(url, { method: 'get' })
+      .then(response => response.json())
+      .then(responseJson => {
+        if (responseJson["error"]) {
+          window.location.href = '/'
+        } else {
+          return responseJson["data"]
+        }
+
+      })
+      .catch(error => window.location.href = '/')
+
+    return data
+  }
+
+  function getAttraction(data) {
+
+    document.querySelector(".profile-img").src = data["images"][imgIndex]
+
+    for (let i = 0; i < data["images"].length - 1; i++) {
+      const circle = document.createElement("img");
+      circle.classList.add("circle");
+      circle.src = "/picture/circle.png";
+      circleCounts.appendChild(circle);
+    }
+
+    document.querySelector(".profile-name").textContent = data["name"]
+    document.querySelector(".address").textContent = data["address"]
+    document.querySelector(".profile-category").textContent = data["category"] + " at " + data["mrt"]
+    document.querySelector(".description").textContent = data["description"]
+    document.querySelector(".transport").textContent = data["transport"]
+
+  }
+
+  const originUrl = location.href;
+  const index = originUrl.search('attraction/') + 11;
+  const id = Number(originUrl.slice(index));
+
+  const am = document.querySelector(".day-button-am");
+  const pm = document.querySelector(".day-button-pm");
+
+  const circleCounts = document.querySelector(".attraction-circle");
+  const imgRight = document.querySelector(".img-right");
+  const imgLeft = document.querySelector(".img-left");
+  let imgIndex = 0;
+
+  // fetch該頁資料存到參數data，再去做後續渲染畫面及DOM監聽
+  const data = fetchAPI(id);
+
+  data
+    .then(data => {
+
+      getAttraction(data);
+
+      am.addEventListener('click', () => {
+        const amSelect = am.querySelector('.day-core');
+        const pmSelect = pm.querySelector('.day-core');
+
+        if (!amSelect) {
+          const select = document.createElement("img");
+          select.classList.add("day-core");
+          select.src = "/picture/day-btn.png";
+          am.appendChild(select);
+          pmSelect.remove();
+          document.querySelector(".booking-price-amount").textContent = '新台幣 2000 元';
+        }
+
+      })
+
+      pm.addEventListener('click', () => {
+        const amSelect = am.querySelector('.day-core');
+        const pmSelect = pm.querySelector('.day-core');
+
+        if (!pmSelect) {
+          const select = document.createElement("img");
+          select.classList.add("day-core");
+          select.src = "/picture/day-btn.png";
+          pm.appendChild(select);
+          amSelect.remove();
+          document.querySelector(".booking-price-amount").textContent = '新台幣 2500 元';
+        }
+      })
+
+      imgRight.addEventListener('click', () => {
+
+        if (imgIndex < data["images"].length - 1) {
+          imgIndex += 1;
+          document.querySelector(".profile-img").src = data["images"][imgIndex];
+
+          const circle = document.createElement("img");
+          circle.classList.add("circle");
+          circle.src = "/picture/circle.png";
+          circleCounts.insertBefore(circle, circleCounts.firstChild);
+          circleCounts.lastChild.remove();
+        }
+
+      })
+
+      imgLeft.addEventListener('click', () => {
+
+        if (imgIndex > 0) {
+          imgIndex -= 1;
+          document.querySelector(".profile-img").src = data["images"][imgIndex];
+
+          const circle = document.createElement("img");
+          circle.classList.add("circle");
+          circle.src = "/picture/circle.png";
+          circleCounts.appendChild(circle);
+          circleCounts.firstChild.remove();
+        }
+
+      })
+
+    })
+    .catch(error => window.location.href = '/')
+
+</script>
+{% endblock %}
