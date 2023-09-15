@@ -432,6 +432,8 @@
     top: 10px;
     left: 10px;
     position: absolute;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .name {
@@ -1208,7 +1210,7 @@
   }
 
   .name-info {
-    width: 302px;
+    width: calc(100% - 20px);
     height: 20px;
     top: 10px;
     left: 10px;
@@ -1216,8 +1218,9 @@
   }
 
   .name {
-    width: 302px;
+    width: 100%;
     height: 20px;
+    display: flex;
 
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
@@ -2002,7 +2005,7 @@
   }
 
   .middle-container {
-    width: 266px;
+    width: calc(100% -94px);
     height: 50px;
     padding: 13px 0px;
     display: flex;
@@ -2010,7 +2013,7 @@
   }
 
   .listItem-container {
-    width: 246px;
+    width: 100%;
     height: 24px;
     overflow: hidden;
     /*自動隱藏超出的文字或圖片*/
@@ -2057,13 +2060,13 @@
   }
 
   .attractions-group {
-    width: 352px;
+    width: 100%;
     min-height: 605px;
     display: block;
   }
 
   .attraction {
-    width: 322px;
+    width: calc(100% - 30px);
     height: 280px;
     border-radius: 5px;
     margin: 15px;
@@ -2073,7 +2076,8 @@
   }
 
   .details-bottom {
-    width: 322px;
+    width: 100%;
+    ;
     height: 45px;
     top: 235px;
     gap: 4px;
@@ -2087,14 +2091,15 @@
   }
 
   .details-info {
-    width: 301px;
+    width: calc(100% - 20px);
     height: 25px;
     display: flex;
     position: relative;
+    justify-content: space-between;
   }
 
   .mrt {
-    width: 150px;
+    width: 100%;
     height: 25px;
 
     font-family: 'Noto Sans TC', sans-serif;
@@ -2110,9 +2115,9 @@
   }
 
   .category {
-    width: 150px;
+    width: 100%;
     height: 25px;
-    left: 151px;
+    left: 0px;
 
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
@@ -2128,7 +2133,8 @@
   }
 
   .details-middle {
-    width: 322px;
+    width: 100%;
+    ;
     height: 40px;
     top: 195px;
     gap: 4px;
@@ -2136,7 +2142,8 @@
   }
 
   .name-bg {
-    width: 322px;
+    width: 100%;
+    ;
     height: 40px;
     background: rgba(0, 0, 0, 0.6);
     position: relative;
@@ -2165,7 +2172,7 @@
   }
 
   .attraction-img {
-    width: 322px;
+    width: 100%;
     height: 235px;
     border-radius: 5px 5px 0 0;
   }
@@ -2765,5 +2772,11 @@
     width: 100%;
   }
 
+  .name-info {
+    width: calc(100% - 20px);
+  }
 
+  .name {
+    width: 100%;
+  }
 }
