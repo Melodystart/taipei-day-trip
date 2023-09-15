@@ -120,20 +120,42 @@
 
   function getAttraction(data) {
 
-    document.querySelector(".profile-img").src = data["images"][imgIndex]
-
-    for (let i = 0; i < data["images"].length - 1; i++) {
-      const circle = document.createElement("img");
-      circle.classList.add("circle");
-      circle.src = "/picture/circle.png";
-      circleCounts.appendChild(circle);
-    }
-
+    document.querySelector(".profile-img").src = "/picture/loading.jpg"  // 先放"載入中"圖片
     document.querySelector(".profile-name").textContent = data["name"]
     document.querySelector(".address").textContent = data["address"]
     document.querySelector(".profile-category").textContent = data["category"] + " at " + data["mrt"]
     document.querySelector(".description").textContent = data["description"]
     document.querySelector(".transport").textContent = data["transport"]
+
+    function loadImgCount() {
+      loadImgNum++;
+      if (loadImgNum === data["images"].length) {
+        document.querySelector(".profile-img").src = data["images"][imgIndex];
+        circleCounts.lastChild.remove();
+      }
+    }
+
+    let loadImgNum = 0
+
+    for (let i = 0; i < data["images"].length; i++) {
+      const circle = document.createElement("img");
+      circle.classList.add("circle");
+      circle.src = "/picture/circle.png";
+      circleCounts.appendChild(circle);
+
+      let image = new Image()
+      image.src = data["images"][i];  // 載入景點圖片
+
+      if (image.complete) {           // 若圖片先前已被載入過
+        loadImgCount();
+
+      } else {                        // 若圖片首次被載入
+        image.onload = function () {
+          loadImgCount();
+
+        }
+      }
+    }
 
   }
 

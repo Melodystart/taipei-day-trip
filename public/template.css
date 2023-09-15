@@ -432,6 +432,8 @@
     top: 10px;
     left: 10px;
     position: absolute;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .name {
@@ -872,7 +874,6 @@
     margin: 0 auto;
     height: 1px;
     background-color: #E8E8E8;
-    /* border: 1px solid #E8E8E8; */
   }
 
   .info {
@@ -981,13 +982,14 @@
 @media screen and (max-width:1200px) {
 
   .nav-container {
-    width: 736px;
+    width: 100%;
     height: 54px;
     position: relative;
     top: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 0 0 10px;
   }
 
   .frame2 {
@@ -1071,11 +1073,12 @@
 
   main {
     min-height: 715px;
-    padding: 40px 0px 0px 0px;
+    padding: 40px 15px 0px 15px;
+    margin: 0 auto;
   }
 
   .main-container {
-    width: 736px;
+    width: 100%;
     min-height: 715px;
     display: flex;
     justify-content: center;
@@ -1083,7 +1086,7 @@
   }
 
   .list-bar {
-    width: 736px;
+    width: 100%;
     height: 70px;
     padding: 0px 0px 20px 0px;
     color: #FFFFFF;
@@ -1092,7 +1095,7 @@
   }
 
   .middle-container {
-    width: 736px;
+    width: calc(100% - 94px);
     height: 50px;
     padding: 13px 0px;
     display: flex;
@@ -1108,7 +1111,7 @@
   }
 
   .attractions {
-    width: 736px;
+    width: 100%;
     min-height: 605px;
     padding: 0px;
     display: flex;
@@ -1116,26 +1119,27 @@
   }
 
   .attractions-group {
-    width: 736px;
+    width: 100%;
     min-height: 786px;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(6, 1fr);
-    /* grid-gap: 10px; */
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-gap: 15px;
   }
 
   .attraction {
-    width: 322px;
+    /* width: 322px; */
+    width: 100%;
     height: 280px;
     border-radius: 5px;
-    margin: 15px;
+    /* margin: 15px; */
 
     border: 1px solid #E8E8E8;
     position: relative;
   }
 
   .details-bottom {
-    width: 322px;
+    width: 100%;
     height: 45px;
     top: 235px;
     gap: 4px;
@@ -1149,14 +1153,16 @@
   }
 
   .details-info {
-    width: 301px;
+    width: 100%;
     height: 25px;
     display: flex;
+    justify-content: space-between;
     position: relative;
+    margin: 0 10px;
   }
 
   .mrt {
-    width: 150px;
+    width: 100%;
     height: 25px;
 
     font-family: 'Noto Sans TC', sans-serif;
@@ -1172,9 +1178,9 @@
   }
 
   .category {
-    width: 150px;
+    width: 100%;
     height: 25px;
-    left: 151px;
+    left: 0px;
 
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
@@ -1185,12 +1191,11 @@
 
     display: flex;
     align-items: center;
-    position: absolute;
     justify-content: right;
   }
 
   .details-middle {
-    width: 322px;
+    width: 100%;
     height: 40px;
     top: 195px;
     gap: 4px;
@@ -1198,14 +1203,14 @@
   }
 
   .name-bg {
-    width: 322px;
+    width: 100%;
     height: 40px;
     background: rgba(0, 0, 0, 0.6);
     position: relative;
   }
 
   .name-info {
-    width: 302px;
+    width: calc(100% - 20px);
     height: 20px;
     top: 10px;
     left: 10px;
@@ -1213,8 +1218,9 @@
   }
 
   .name {
-    width: 302px;
+    width: 100%;
     height: 20px;
+    display: flex;
 
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
@@ -1227,7 +1233,7 @@
   }
 
   .attraction-img {
-    width: 322px;
+    width: 100%;
     height: 235px;
     border-radius: 5px 5px 0 0;
   }
@@ -1235,8 +1241,6 @@
   .attraction-section {
     width: calc(100% - 30px);
     height: 400px;
-    /* position: absolute; 好像會跟margin: 0 auto衝突後續可再研究*/
-    /* margin: 0 auto; */
     padding: 40px 0;
     position: relative;
     display: flex;
@@ -1656,7 +1660,6 @@
 
   .address {
     width: calc(100% - 20px);
-    /* height: 24px; */
     padding: 0 10px;
 
     font-family: 'Noto Sans TC', sans-serif;
@@ -2002,7 +2005,7 @@
   }
 
   .middle-container {
-    width: 266px;
+    width: calc(100% -94px);
     height: 50px;
     padding: 13px 0px;
     display: flex;
@@ -2010,7 +2013,7 @@
   }
 
   .listItem-container {
-    width: 246px;
+    width: 100%;
     height: 24px;
     overflow: hidden;
     /*自動隱藏超出的文字或圖片*/
@@ -2057,13 +2060,13 @@
   }
 
   .attractions-group {
-    width: 352px;
+    width: 100%;
     min-height: 605px;
     display: block;
   }
 
   .attraction {
-    width: 322px;
+    width: calc(100% - 30px);
     height: 280px;
     border-radius: 5px;
     margin: 15px;
@@ -2073,7 +2076,8 @@
   }
 
   .details-bottom {
-    width: 322px;
+    width: 100%;
+    ;
     height: 45px;
     top: 235px;
     gap: 4px;
@@ -2087,14 +2091,15 @@
   }
 
   .details-info {
-    width: 301px;
+    width: calc(100% - 20px);
     height: 25px;
     display: flex;
     position: relative;
+    justify-content: space-between;
   }
 
   .mrt {
-    width: 150px;
+    width: 100%;
     height: 25px;
 
     font-family: 'Noto Sans TC', sans-serif;
@@ -2110,9 +2115,9 @@
   }
 
   .category {
-    width: 150px;
+    width: 100%;
     height: 25px;
-    left: 151px;
+    left: 0px;
 
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
@@ -2128,7 +2133,8 @@
   }
 
   .details-middle {
-    width: 322px;
+    width: 100%;
+    ;
     height: 40px;
     top: 195px;
     gap: 4px;
@@ -2136,7 +2142,8 @@
   }
 
   .name-bg {
-    width: 322px;
+    width: 100%;
+    ;
     height: 40px;
     background: rgba(0, 0, 0, 0.6);
     position: relative;
@@ -2165,7 +2172,7 @@
   }
 
   .attraction-img {
-    width: 322px;
+    width: 100%;
     height: 235px;
     border-radius: 5px 5px 0 0;
   }
@@ -2698,5 +2705,78 @@
     width: 36px;
     height: 36px;
     cursor: pointer;
+  }
+}
+
+@media screen and (max-width:830px) and (min-width:530px) {
+  .attractions-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    grid-gap: 15px
+  }
+
+  .main-container {
+    width: 100%;
+  }
+
+  .list-bar {
+    width: 100%;
+  }
+
+  .middle-container {
+    width: calc(100% - 94px);
+  }
+
+  .listItem-container {
+    width: 100%;
+  }
+
+  .attractions {
+    width: calc(100% - 30px);
+    margin: 0 auto;
+  }
+
+  .attraction {
+    width: 100%;
+    margin: 0;
+  }
+
+  .details-bottom {
+    width: 100%;
+  }
+
+  .details-info {
+    width: 100%;
+  }
+
+  .mrt {
+    width: 100%;
+  }
+
+  .category {
+    width: 100%;
+    left: 0px;
+  }
+
+  .details-middle {
+    width: 100%;
+  }
+
+  .name-bg {
+    width: 100%;
+  }
+
+  .attraction-img {
+    width: 100%;
+  }
+
+  .name-info {
+    width: calc(100% - 20px);
+  }
+
+  .name {
+    width: 100%;
   }
 }
