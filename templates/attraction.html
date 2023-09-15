@@ -127,6 +127,7 @@
       circle.classList.add("circle");
       circle.src = "/picture/circle.png";
       circleCounts.appendChild(circle);
+      new Image().src = data["images"][i + 1];  //預先載入該景點第2張~最後1張圖片
     }
 
     document.querySelector(".profile-name").textContent = data["name"]
