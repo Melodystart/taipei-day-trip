@@ -1,6 +1,9 @@
 import mysql.connector
 from mysql.connector import pooling
 import math
+import jwt
+from datetime import datetime, timedelta
+import requests
 from flask import *
 app=Flask(
 	__name__,
@@ -9,6 +12,7 @@ app=Flask(
 	)
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
+key = "secret"
 
 conPool = pooling.MySQLConnectionPool(user='root', password='password', host='localhost', database='attractions', pool_name='attractionsConPool', pool_size=10)
 
@@ -166,4 +170,99 @@ def getMrts():
 		result["message"] = e.__class__.__name__+": "+str(e.args[0])
 		return result, 500
 	
+@app.route("/api/user",methods=['POST'])
+def signup():
+	result = {}
+	try:
+		data = request.get_json()
+		name = data['name'].strip()
+		email = data['email'].strip()
+		password = data['password'].strip()
+
+		if not name or not email or not password:
+			result["error"] = True
+			result["message"] = "註冊失敗：欄位皆為必填"
+			return result, 400
+		
+		con = conPool.get_connection()
+		cursor = con.cursor()
+
+		cursor.execute("SELECT email FROM member WHERE email=%s",(email,))
+		data = cursor.fetchone()
+
+		if data != None:
+			result["error"] = True
+			result["message"] = "註冊失敗：email已註冊過"
+			return result, 400
+		else:
+			cursor.execute("INSERT INTO member (name, email, password) VALUES (%s, %s, %s)",(name, email, password))
+			con.commit()
+			result["ok"] = True
+			return result, 200
+
+		cursor.close()
+		con.close()
+
+	except Exception as e:
+		result["error"] = True
+		result["message"] = e.__class__.__name__+": "+str(e.args[0])
+		return result, 500
+
+@app.route("/api/user/auth",methods=['PUT'])
+def signin():
+	result = {}
+	try:
+		data = request.get_json()
+		email = data["email"].strip()
+		password = data["password"].strip()
+
+		if not email or not password:
+			result["error"] = True
+			result["message"] = "登入失敗：欄位皆為必填"
+			return result, 400
+
+		con = conPool.get_connection()
+		cursor = con.cursor()
+
+		cursor.execute("SELECT id, name, email FROM member WHERE email=%s AND password=%s",(email, password))
+		data = cursor.fetchone()
+
+		cursor.close()
+		con.close()
+
+		if ( data == None):
+			result["error"] = True
+			result["message"] = "登入失敗：帳號或密碼錯誤"
+			return result, 400
+		else:
+			payload = {}
+			payload["id"] = data[0]
+			payload["name"] = data[1] 
+			payload["email"] = data[2]
+			payload["exp"] = datetime.utcnow() + timedelta(days=7)
+
+			result["token"] = jwt.encode(payload, key, algorithm="HS256")
+			return result, 200
+
+	except Exception as e:
+		result["error"] = True
+		result["message"] = e.__class__.__name__+": "+str(e.args[0])
+		return result, 500
+
+@app.route("/api/user/auth",methods=['GET'])
+def getStatus():
+	result = {}
+	result["data"] ={}
+	try:
+		token = request.headers['Authorization'][7:]
+		userInfo = jwt.decode(token, key, algorithms="HS256")
+		result["data"]["id"] = userInfo["id"]
+		result["data"]["name"] = userInfo["name"]
+		result["data"]["email"] = userInfo["email"]
+		return result, 200		
+
+	except:
+		result["data"] = None
+		return result, 200
+
 app.run(host="0.0.0.0", port=3000)
