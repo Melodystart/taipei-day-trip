@@ -22,13 +22,35 @@
           <div class="nav-button1">
             <span class="nav-button1-text">預定行程</span>
           </div>
-          <div class="nav-button2">
-            <span class="nav-button2-text">登入/註冊</span>
+          <div class="nav-button2" id="login">
+            <span class="nav-button2-text"></span>
           </div>
         </div>
       </div>
     </div>
   </nav>
+
+  <dialog class="dialog-mask">
+    <div class="dialog-box">
+      <div class="decorator-bar">
+      </div>
+      <div class="dialog-main-container">
+        <div class="dialog-close">
+          <img src="/picture/close.png">
+        </div>
+        <div class="dialog-main">
+          <div class="dialog-title">登入會員帳號</div>
+          <div class="input-email"><input type="text" class="input-text" id="email" name="email" placeholder="輸入電子郵件">
+          </div>
+          <div class="input"><input type="password" class="input-text" id="password" name="password" placeholder="輸入密碼">
+          </div>
+          <button class="dialog-button" onclick="signin()">登入帳戶</button>
+          <div class="message"></div>
+          <div class="switch-signup" onclick="toSignup()">還沒有帳戶？點此註冊</div>
+        </div>
+
+      </div>
+  </dialog>
 
   {% block main %}{% endblock %}
 
@@ -38,6 +60,160 @@
     </div>
   </footer>
 
+  <script>
+    const loginBtn = document.querySelector("#login");
+    const dialog = document.querySelector(".dialog-mask");
+    const dialogClose = document.querySelector(".dialog-close");
+    const dialogBox = document.querySelector(".dialog-box");
+    const dialogMain = document.querySelector(".dialog-main");
+    const message = document.querySelector(".message");
+
+    function signup() {
+      const username = document.querySelector("#username").value.trim()
+      const email = document.querySelector("#email").value.trim()
+      const password = document.querySelector("#password").value.trim()
+      const postMethod = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: username,
+          email: email,
+          password: password
+        })
+      }
+      message.style.display = 'flex';
+      dialogBox.style.height = '364px';
+
+      fetch('/api/user', postMethod)
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson["ok"]) {
+            message.innerText = "註冊成功請登入";
+          } else {
+            message.innerText = responseJson["message"];
+          }
+        })
+        .catch(error => console.error("Error:", error))
+    }
+
+    function signin() {
+      const email = document.querySelector("#email").value.trim()
+      const password = document.querySelector("#password").value.trim()
+      const putMethod = {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      }
+
+      const data = fetch('/api/user/auth', putMethod)
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson["error"]) {
+            message.innerText = responseJson["message"];
+            message.style.display = 'flex';
+            dialogBox.style.height = '307px';
+          } else {
+            localStorage.setItem("token", responseJson["token"]);
+            window.location.reload();
+          }
+        })
+        .catch(error => console.error("Error:", error))
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.reload();
+    }
+
+    function toSignup() {
+      message.style.display = 'none';
+      const inputUsername = document.createElement("div");
+      inputUsername.classList.add("input-username");
+      inputUsername.innerHTML =
+        `<input type="text" class="input-text" id="username" name="username" placeholder="輸入姓名">`;
+      dialogMain.insertBefore(inputUsername, document.querySelector(".input-email"));
+      dialogBox.style.height = '332px';
+      document.querySelector(".switch-signup").remove();
+
+      document.querySelector(".dialog-title").innerText = "註冊會員帳號";
+      document.querySelector(".dialog-button").innerText = "註冊新帳戶";
+      document.querySelector(".dialog-button").onclick = function () { signup(); };
+
+      const switchSignin = document.createElement("div");
+      switchSignin.classList.add("switch-signin");
+      switchSignin.innerText = "已經有帳戶了？點此登入";
+      dialogMain.appendChild(switchSignin);
+      document.querySelector(".switch-signin").onclick = function () { toSignin(); };
+    }
+
+    function toSignin() {
+      message.style.display = 'none';
+      dialogBox.style.height = '275px';
+      document.querySelector(".input-username").remove();
+      document.querySelector(".switch-signin").remove();
+
+      document.querySelector(".dialog-title").innerText = "登入會員帳號";
+      document.querySelector(".dialog-button").innerText = "登入帳戶";
+      document.querySelector(".dialog-button").onclick = function () { signin(); };
+
+      const switchSignup = document.createElement("div");
+      switchSignup.classList.add("switch-signup");
+      switchSignup.innerText = "還沒有帳戶？點此註冊";
+      dialogMain.appendChild(switchSignup);
+      document.querySelector(".switch-signup").onclick = function () { toSignup(); };
+    }
+
+    function getStatus() {
+      const getMethod = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+      }
+
+      fetch('/api/user/auth', getMethod)
+        .then(response => response.json())
+        .then(responseJson => {
+
+          if (responseJson["data"] === null) {
+            loginBtn.innerHTML = `<span class="nav-button2-text">登入/註冊</span>`;
+
+          } else {
+            dialog.style.display = "none";
+            document.querySelector("#login").remove();
+
+            const logoutBtn = document.createElement("div");
+            logoutBtn.classList.add("nav-button2");
+            logoutBtn.id = "logout"
+            logoutBtn.innerHTML = `<span class="nav-button2-text">登出系統</span>`;
+            document.querySelector(".frame1").appendChild(logoutBtn);
+            logoutBtn.onclick = function () { logout(); };
+            console.log(responseJson["data"]);
+          }
+        })
+        .catch(error => console.error("Error:", error))
+    }
+
+    getStatus();
+
+    loginBtn.addEventListener("click", () => {
+      dialog.style.display = "flex";
+      message.style.display = 'none';
+    })
+
+    dialogClose.addEventListener("click", () => {
+      dialog.style.display = "none";
+    })
+
+  </script>
   {% block js %}{% endblock %}
 
 </body>

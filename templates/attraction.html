@@ -20,10 +20,7 @@
     </div>
 
     <div class="attraction-circle">
-
       <img class="circle-current" src="/picture/circle-current.png">
-      <!-- <img class="circle" src="/picture/circle.png"> -->
-
     </div>
   </div>
 
@@ -211,31 +208,43 @@
 
       imgRight.addEventListener('click', () => {
 
+        const circle = document.createElement("img");
+
         if (imgIndex < data["images"].length - 1) {
           imgIndex += 1;
-          document.querySelector(".profile-img").src = data["images"][imgIndex];
-
-          const circle = document.createElement("img");
           circle.classList.add("circle");
           circle.src = "/picture/circle.png";
-          circleCounts.insertBefore(circle, circleCounts.firstChild);
-          circleCounts.lastChild.remove();
+
+        } else {
+          imgIndex = 0;
+          circle.classList.add("circle-current");
+          circle.src = "/picture/circle-current.png";
         }
+
+        circleCounts.insertBefore(circle, circleCounts.firstElementChild);
+        circleCounts.lastElementChild.remove();
+        document.querySelector(".profile-img").src = data["images"][imgIndex];
 
       })
 
       imgLeft.addEventListener('click', () => {
 
+        const circle = document.createElement("img");
+
         if (imgIndex > 0) {
           imgIndex -= 1;
-          document.querySelector(".profile-img").src = data["images"][imgIndex];
-
-          const circle = document.createElement("img");
           circle.classList.add("circle");
           circle.src = "/picture/circle.png";
-          circleCounts.appendChild(circle);
-          circleCounts.firstChild.remove();
+
+        } else {
+          imgIndex = data["images"].length - 1;
+          circle.classList.add("circle-current");
+          circle.src = "/picture/circle-current.png";
         }
+
+        circleCounts.appendChild(circle);
+        circleCounts.firstElementChild.remove();
+        document.querySelector(".profile-img").src = data["images"][imgIndex];
 
       })
 
