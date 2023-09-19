@@ -14,6 +14,7 @@ con = mysql.connector.connect(
 cursor = con.cursor()
 
 # 建立資料庫、table
+cursor.execute("DROP database IF EXISTS attractions;")
 cursor.execute("CREATE database attractions;")
 cursor.execute("USE attractions;")
 cursor.execute("CREATE table main (id BIGINT PRIMARY KEY NOT NULL,name VARCHAR(255),category VARCHAR(255),description TEXT,address TEXT,transport TEXT,mrt VARCHAR(255),lat DECIMAL(8,6),lng DECIMAL(9,6));")
