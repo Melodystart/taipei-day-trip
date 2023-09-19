@@ -121,7 +121,7 @@
             dialogBox.style.height = '307px';
           } else {
             localStorage.setItem("token", responseJson["token"]);
-            getStatus();
+            window.location.reload();
           }
         })
         .catch(error => console.error("Error:", error))
@@ -129,17 +129,7 @@
 
     function logout() {
       localStorage.clear();
-      document.querySelector("#logout").remove();
-
-      const loginBtn = document.createElement("div");
-      loginBtn.classList.add("nav-button2");
-      loginBtn.id = "login"
-      loginBtn.innerHTML = `<span class="nav-button2-text">登入/註冊</span>`;
-      document.querySelector(".frame1").appendChild(loginBtn);
-      loginBtn.onclick = function () {
-        dialog.style.display = "flex";
-        message.style.display = 'none';
-      };
+      window.location.reload();
     }
 
     function toSignup() {
