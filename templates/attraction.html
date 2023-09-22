@@ -14,6 +14,23 @@
 
     <img src="" class="profile-img">
 
+    <div class="loading">
+      <div class="loading-text">LOADING...</div>
+      <div class="loading-bar">
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+        <div class="loading-block"></div>
+      </div>
+
+    </div>
+
     <div class="attraction-button">
       <img class="img-left" src="/picture/attraction-arrow-left.png">
       <img class="img-right" src="/picture/attraction-arrow-right.png">
@@ -41,7 +58,6 @@
       <div class="booking-date">
         <span class="booking-date-title">選擇日期：</span>
         <div class="booking-date-container">
-          <!-- <input type="date" class="date" name="date" placeholder="yyyy/mm/dd"> -->
           <input type="text" class="date" placeholder="yyyy/mm/dd" onfocus="(this.type='date')">
           <span class="calendar"></sapn>
         </div>
@@ -122,12 +138,13 @@
     document.querySelector(".profile-category").textContent = data["category"] + " at " + data["mrt"]
     document.querySelector(".description").textContent = data["description"]
     document.querySelector(".transport").textContent = data["transport"]
-    document.querySelector(".profile-img").src = "/picture/loading.jpg"  // 先放"載入中"圖片
 
     function loadImgCount() {
       loadImgNum++;
       if (loadImgNum === data["images"].length) {
         document.querySelector(".profile-img").src = data["images"][imgIndex];
+        document.querySelector(".profile-img").style.display = "flex";
+        document.querySelector(".loading").style.display = "none";
         circleCounts.lastChild.remove();
       }
     }

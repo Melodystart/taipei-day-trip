@@ -101,6 +101,11 @@
     color: #666666;
   }
 
+  #login,
+  #logout {
+    display: none;
+  }
+
   .hero-section {
     /* width: 1920px; */
     height: 320px;
@@ -520,11 +525,52 @@
     margin: 0 0 0 15px;
   }
 
+  .loading {
+    position: absolute;
+    top: 135px;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .loading-text {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: #448899;
+  }
+
+  .loading-bar {
+    width: calc(100% - 112px);
+    height: 30px;
+    border: 3px solid #448899;
+    border-radius: 12px;
+    margin: 25px;
+    padding: 0 0 0 8px;
+
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    grid-gap: 3px;
+    align-items: center;
+  }
+
+  .loading-block {
+    background-color: #448899;
+    width: 15px;
+    height: 22px;
+    border-radius: 5px;
+  }
+
   .profile-img {
     width: 540px;
     height: 406px;
     top: -3px;
     position: absolute;
+    display: none;
   }
 
   .attraction-button {

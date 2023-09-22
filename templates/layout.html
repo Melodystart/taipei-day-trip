@@ -23,7 +23,10 @@
             <span class="nav-button1-text">預定行程</span>
           </div>
           <div class="nav-button2" id="login">
-            <span class="nav-button2-text"></span>
+            <span class="nav-button2-text">登入/註冊</span>
+          </div>
+          <div class="nav-button2" id="logout">
+            <span class="nav-button2-text">登出系統</span>
           </div>
         </div>
       </div>
@@ -112,7 +115,7 @@
         })
       }
 
-      const data = fetch('/api/user/auth', putMethod)
+      fetch('/api/user/auth', putMethod)
         .then(response => response.json())
         .then(responseJson => {
           if (responseJson["error"]) {
@@ -184,18 +187,14 @@
         .then(responseJson => {
 
           if (responseJson["data"] === null) {
-            loginBtn.innerHTML = `<span class="nav-button2-text">登入/註冊</span>`;
+            document.querySelector("#logout").style.display = "none";
+            document.querySelector("#login").style.display = "flex";
 
           } else {
             dialog.style.display = "none";
-            document.querySelector("#login").remove();
-
-            const logoutBtn = document.createElement("div");
-            logoutBtn.classList.add("nav-button2");
-            logoutBtn.id = "logout"
-            logoutBtn.innerHTML = `<span class="nav-button2-text">登出系統</span>`;
-            document.querySelector(".frame1").appendChild(logoutBtn);
-            logoutBtn.onclick = function () { logout(); };
+            document.querySelector("#logout").style.display = "flex";
+            document.querySelector("#login").style.display = "none";
+            document.querySelector("#logout").onclick = function () { logout(); };
             console.log(responseJson["data"]);
           }
         })
