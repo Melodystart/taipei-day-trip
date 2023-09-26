@@ -54,6 +54,7 @@ def booking():
 def thankyou():
 	return render_template("thankyou.html")
 
+# API
 @app.route("/api/attractions",methods=['GET'])
 def getPage():
 	result = {}
@@ -238,5 +239,113 @@ def getStatus():
 	except:
 		result["data"] = None
 		return result, 200
+
+@app.route("/api/booking",methods=['POST'])
+def bookingAPI():
+	result = {}
+	try:
+		try:
+			token = request.headers['Authorization'][7:]
+			userInfo = jwt.decode(token, key, algorithms="HS256")
+		except:
+			return error(result,"未登入系統，拒絕存取"), 403
+
+		data = request.get_json()
+		memberId = userInfo["id"]
+		attractionId = data['attractionId']
+		date = data['date']
+		time = data['time']
+		price = data['price']
+
+		if not memberId or not attractionId or not date or not time or not price:
+			return error(result,"建立失敗，輸入不正確或其他原因"), 400
+
+		con = conPool.get_connection()
+		cursor = con.cursor()
+
+		cursor.execute("SELECT* FROM booking WHERE memberId=%s",(memberId,))
+		data = cursor.fetchone()
+
+		if data != None:
+			cursor.execute("DELETE FROM booking WHERE memberId=%s",(memberId,))
+			con.commit()
+
+		cursor.execute("INSERT INTO booking (memberId, attractionId, date, time, price) VALUES (%s, %s, %s, %s, %s)",(memberId, attractionId, date, time, price))
+		con.commit()
+
+		cursor.close()
+		con.close()
+
+		result["ok"] = True
+		return result, 200
+		
+	except Exception as e:
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+
+@app.route("/api/booking",methods=['GET'])
+def getBooking():
+	result = {}
+	try:
+		try:
+			token = request.headers['Authorization'][7:]
+			userInfo = jwt.decode(token, key, algorithms="HS256")
+		except:
+			return error(result,"未登入系統，拒絕存取"), 403
+
+		try:
+			memberId = userInfo["id"]
+			con = conPool.get_connection()
+			cursor = con.cursor()
+			
+			sql = "SELECT booking.attractionId,main.name, main.address, image.images, booking.date, booking.time, booking.price FROM booking LEFT JOIN main ON booking.attractionId = main.id LEFT JOIN image ON booking.attractionId = image.attraction_id WHERE booking.memberId = %s ORDER BY image.id LIMIT 1"
+
+			cursor.execute(sql,(memberId,))
+			data = cursor.fetchone()
+
+			cursor.close()
+			con.close()
+
+			result["data"] ={}
+			result["data"]["attraction"] = {}
+			result["data"]["attraction"]["id"] = data[0]
+			result["data"]["attraction"]["name"] = data[1]
+			result["data"]["attraction"]["address"] = data[2]
+			result["data"]["attraction"]["image"] = data[3]
+			result["data"]["date"] = data[4]
+			result["data"]["time"] = data[5]
+			result["data"]["price"] = data[6]
+			return result, 200		
+		except:
+			result["data"] = None
+			return result, 200
+
+	except Exception as e:
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+
+@app.route("/api/booking",methods=['DELETE'])
+def deleteBooking():
+	result = {}
+	try:
+		try:
+			token = request.headers['Authorization'][7:]
+			userInfo = jwt.decode(token, key, algorithms="HS256")
+		except:
+			return error(result,"未登入系統，拒絕存取"), 403
+
+		memberId = userInfo["id"]
+		con = conPool.get_connection()
+		cursor = con.cursor()
+		
+		cursor.execute("DELETE FROM booking WHERE memberId=%s",(memberId,))
+		con.commit()
+
+		cursor.close()
+		con.close()
+
+		result["ok"] = True
+		return result, 200
+
+	except:
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
 
 app.run(host="0.0.0.0", port=3000)

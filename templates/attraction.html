@@ -58,7 +58,7 @@
       <div class="booking-date">
         <span class="booking-date-title">選擇日期：</span>
         <div class="booking-date-container">
-          <input type="text" class="date" placeholder="yyyy/mm/dd" onfocus="(this.type='date')">
+          <input type="text" class="date" placeholder="yyyy/mm/dd" onfocus="(this.type='date')" required>
           <span class="calendar"></sapn>
         </div>
       </div>
@@ -76,7 +76,6 @@
         <div class="booking-time-pm">
           <div class="day-button-pm">
             <img class="day-outline" src="/picture/day-outline.png">
-            <!-- <img class="day-core" src="/picture/day-btn.png"> -->
           </div>
           <div class="day-text">
             下半天
@@ -87,7 +86,7 @@
         <div class="booking-price-title">導覽費用：</div>
         <div class="booking-price-amount">新台幣 2000 元</div>
       </div>
-      <div class="booking-button">
+      <div class="booking-button" onclick="booking()">
         <span class="booking-button-text">開始預約行程</span>
       </div>
     </div>
@@ -174,6 +173,49 @@
 
   }
 
+  function booking() {
+    /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+    getStatus().then(userInfo => {
+
+      if (userInfo === null) {
+        dialog.style.display = "flex";
+        message.style.display = "none";
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        
+      } else {
+        const date = document.querySelector(".date").value;
+        const postMethod = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify({
+            attractionId: id,
+            date: date,
+            time: time,
+            price: price
+          })
+        }
+
+        fetch('/api/booking', postMethod)
+          .then(response => response.json())
+          .then(responseJson => {
+            if (responseJson["ok"]) {
+              window.location.href = '/booking'
+            } else {
+              alert(responseJson["message"]);
+            }
+          })
+          .catch(error => console.error("Error:", error))
+      }
+
+    })
+  }
+
   const originUrl = location.href;
   const index = originUrl.search('attraction/') + 11;
   const id = Number(originUrl.slice(index));
@@ -185,6 +227,8 @@
   const imgRight = document.querySelector(".img-right");
   const imgLeft = document.querySelector(".img-left");
   let imgIndex = 0;
+  let time = "morning";
+  let price = 2000;
 
   // fetch該頁資料存到參數data，再去做後續渲染畫面及DOM監聽
   const data = fetchAPI(id);
@@ -197,6 +241,8 @@
       am.addEventListener('click', () => {
         const amSelect = am.querySelector('.day-core');
         const pmSelect = pm.querySelector('.day-core');
+        time = "morning";
+        price = 2000;
 
         if (!amSelect) {
           const select = document.createElement("img");
@@ -212,6 +258,8 @@
       pm.addEventListener('click', () => {
         const amSelect = am.querySelector('.day-core');
         const pmSelect = pm.querySelector('.day-core');
+        time = "afternoon";
+        price = 2500;
 
         if (!pmSelect) {
           const select = document.createElement("img");
