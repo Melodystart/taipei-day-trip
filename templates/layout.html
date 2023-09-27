@@ -19,11 +19,14 @@
       </a>
       <div class="frame2">
         <div class="frame1">
-          <div class="nav-button1">
+          <div class="nav-button1" id="booking">
             <span class="nav-button1-text">預定行程</span>
           </div>
           <div class="nav-button2" id="login">
-            <span class="nav-button2-text"></span>
+            <span class="nav-button2-text">登入/註冊</span>
+          </div>
+          <div class="nav-button2" id="logout">
+            <span class="nav-button2-text">登出系統</span>
           </div>
         </div>
       </div>
@@ -62,6 +65,7 @@
 
   <script>
     const loginBtn = document.querySelector("#login");
+    const bookingBtn = document.querySelector("#booking");
     const dialog = document.querySelector(".dialog-mask");
     const dialogClose = document.querySelector(".dialog-close");
     const dialogBox = document.querySelector(".dialog-box");
@@ -112,7 +116,7 @@
         })
       }
 
-      const data = fetch('/api/user/auth', putMethod)
+      fetch('/api/user/auth', putMethod)
         .then(response => response.json())
         .then(responseJson => {
           if (responseJson["error"]) {
@@ -179,27 +183,26 @@
         },
       }
 
-      fetch('/api/user/auth', getMethod)
+      const userInfo = fetch('/api/user/auth', getMethod)
         .then(response => response.json())
         .then(responseJson => {
 
           if (responseJson["data"] === null) {
-            loginBtn.innerHTML = `<span class="nav-button2-text">登入/註冊</span>`;
+            document.querySelector("#logout").style.display = "none";
+            document.querySelector("#login").style.display = "flex";
+            return responseJson["data"]
 
           } else {
             dialog.style.display = "none";
-            document.querySelector("#login").remove();
-
-            const logoutBtn = document.createElement("div");
-            logoutBtn.classList.add("nav-button2");
-            logoutBtn.id = "logout"
-            logoutBtn.innerHTML = `<span class="nav-button2-text">登出系統</span>`;
-            document.querySelector(".frame1").appendChild(logoutBtn);
-            logoutBtn.onclick = function () { logout(); };
-            console.log(responseJson["data"]);
+            document.querySelector("#logout").style.display = "flex";
+            document.querySelector("#login").style.display = "none";
+            document.querySelector("#logout").onclick = function () { logout(); };
+            return responseJson["data"];
           }
         })
         .catch(error => console.error("Error:", error))
+
+      return userInfo
     }
 
     getStatus();
@@ -211,6 +214,18 @@
 
     dialogClose.addEventListener("click", () => {
       dialog.style.display = "none";
+    })
+
+    bookingBtn.addEventListener("click", () => {
+      /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+      getStatus().then(userInfo => {
+        if (userInfo === null) {
+          dialog.style.display = "flex";
+          message.style.display = 'none';
+        } else {
+          window.location.href = '/booking'
+        }
+      })
     })
 
   </script>

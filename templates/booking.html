@@ -1,0 +1,168 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="../template.css">
+{% endblock %}
+
+{% block main %}
+<div class="separator-nav">
+</div>
+
+<div class="headline">您好，<span class="userName"></span>，待預訂的行程如下：</div>
+
+<div class="booking-content">
+  <div class="booking-container">
+    <div class="booking-section">
+      <div class="booking-picture">
+        <img class="booking-img" src="">
+      </div>
+      <div class="booking-info">
+        <div class="delete"><img src="/picture/delete.png"></div>
+        <div class="booking-info-title">台北一日遊：<span class="booking-info-attraction"></span></div>
+        <div class="booking-info-item">日期：<span class="booking-info-date"></span></div>
+        <div class="booking-info-item">時間：<span class="booking-info-time"></span></div>
+        <div class="booking-info-item">費用：<span class="booking-info-price"></span></div>
+        <div class="booking-info-item" id="booking-address">地點：<span class="booking-info-address"></span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="separator-booking" id="separator-shorten">
+  </div>
+
+  <div class="booking-container">
+    <div class="contact-form">
+      <div class="contact-form-title">您的聯絡資訊</div>
+      <div class="contact-form-item">聯絡姓名：<input class="contact-name"></div>
+      <div class="contact-form-item">聯絡信箱：<input class="contact-email"></div>
+      <div class="contact-form-item">手機號碼：<input class="contact-phone"></div>
+      <div class="contact-form-item" id="contact-notice"><span
+          class="contact-notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</span></div>
+    </div>
+  </div>
+
+  <div class="separator-booking">
+  </div>
+
+  <div class="booking-container">
+    <div class="contact-form">
+      <div class="contact-form-title">信用卡付款資訊</div>
+      <div class="contact-form-item">卡片號碼：<input class="card-number" placeholder="**** **** **** ****"></div>
+      <div class="contact-form-item">過期時間：<input class="card-expire" placeholder="MM / YY"></div>
+      <div class="contact-form-item">驗證密碼：<input class="card-code" placeholder="CVV"></div>
+    </div>
+  </div>
+
+  <div class="separator-booking">
+  </div>
+
+  <div class="booking-container">
+    <div class="booking-confirm">
+      <div class="booking-total"></div>
+      <div class="booking-submit-container">
+        <button class="booking-submit-button">確認訂購並付款</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="booking-none"></div>
+{% endblock %}
+
+
+{% block js %}
+<script>
+  function getBooking() {
+
+    /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+    getStatus().then(userInfo => {
+
+      if (userInfo === null) {
+        window.location.href = '/'
+      };
+
+      const getMethod = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+      }
+
+      fetch('/api/booking', getMethod)
+        .then(response => response.json())
+        .then(responseJson => {
+          document.querySelector(".userName").textContent = userInfo["name"];
+          if (responseJson["data"] === null) {
+            document.querySelector(".booking-none").style.display = "flex";
+            document.querySelector(".booking-none").textContent = "目前沒有任何待預訂的行程";
+            document.querySelector(".booking-content").style.display = "none";
+            document.querySelector(".attraction-footer").style.height = "100%";
+          } else {
+
+            document.querySelector(".booking-content").style.display = "block";
+            document.querySelector(".booking-none").style.display = "none";
+
+            const date = new Date(responseJson["data"]["date"]);
+            document.querySelector(".booking-info-date").textContent = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0")
+
+            let time = "早上9點到中午12點"
+            if (responseJson["data"]["time"] == "afternoon") { time = "下午1點到下午4點" }
+            document.querySelector(".booking-info-time").textContent = time;
+
+            document.querySelector(".booking-img").src = responseJson["data"]["attraction"]["image"];
+            document.querySelector(".booking-info-attraction").textContent = responseJson["data"]["attraction"]["name"];
+            document.querySelector(".booking-info-price").textContent = "新台幣 " + responseJson["data"]["price"] + " 元";
+            document.querySelector(".booking-info-address").textContent = responseJson["data"]["attraction"]["address"];
+
+            document.querySelector(".contact-name").value = userInfo["name"];
+            document.querySelector(".contact-email").value = userInfo["email"];
+
+            document.querySelector(".booking-total").textContent = "總價：新台幣 " + responseJson["data"]["price"] + " 元";
+          }
+        })
+
+    })
+
+  }
+
+  function deleteBooking() {
+
+    /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+    getStatus().then(userInfo => {
+
+      if (userInfo === null) {
+        window.location.href = '/'
+      };
+
+      const deleteMethod = {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+      }
+
+      fetch('/api/booking', deleteMethod)
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson["ok"]) {
+            window.location.reload();
+          }
+        })
+        .catch(error => console.error("Error:", error))
+
+    })
+
+  }
+
+  getBooking();
+
+  const deleteBtn = document.querySelector(".delete");
+  deleteBtn.addEventListener("click", () => {
+    deleteBooking();
+  })
+
+</script>
+{% endblock %}

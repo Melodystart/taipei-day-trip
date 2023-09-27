@@ -16,6 +16,30 @@ key = "secret"
 
 conPool = pooling.MySQLConnectionPool(user='root', password='password', host='localhost', database='attractions', pool_name='attractionsConPool', pool_size=10)
 
+def dataSetting(data):
+  dict = {}
+  dict["id"] = data[0]
+  dict["name"] = data[1]
+  dict["category"] = data[2]
+  dict["description"] = data[3]
+  dict["address"] = data[4]
+  dict["transport"] = data[5]
+  dict["mrt"] = data[6]
+  dict["lat"] = data[7]
+  dict["lng"] = data[8]
+  dict["images"] = data[9].split(',')
+  return dict
+
+def error(result, message):
+	result["error"] = True
+	result["message"] = message
+	return result
+
+def responseWithHeaders(result):
+	response = make_response(result)  #在需要設定headers可用make_response
+	response.headers["Content-Type"] = "application/json; charset=utf-8"
+	return response
+	
 # Pages
 @app.route("/")
 def index():
@@ -30,6 +54,7 @@ def booking():
 def thankyou():
 	return render_template("thankyou.html")
 
+# API
 @app.route("/api/attractions",methods=['GET'])
 def getPage():
 	result = {}
@@ -38,9 +63,7 @@ def getPage():
 		keyword = request.args.get("keyword", None)
 
 		if page < 0:
-			result["error"] = True
-			result["message"] = "page未輸入 或 page輸入非資料有效範圍內"
-			return result, 500
+			return error(result, "page未輸入 或 page輸入非資料有效範圍內"), 500
 
 		con = conPool.get_connection()
 		cursor = con.cursor()
@@ -58,17 +81,13 @@ def getPage():
 			data = cursor.fetchall()
 
 			if (len(data) == 0) & (page == 0):
-				result["error"] = True
-				result["message"] = "找不到符合keyword資料"
-				return result, 500
+				return error(result,"找不到符合keyword資料") , 500
 
 		cursor.close()
 		con.close()
 
 		if len(data) == 0:
-			result["error"] = True
-			result["message"] = "page輸入非資料有效範圍內"
-			return result, 500
+			return error(result,"page輸入非資料有效範圍內"), 500
 
 		if len(data) == 13:          #抓取資料為13筆，即下頁還有資料
 			data.pop()                 #一頁為12筆，故去掉最後一個第13筆                    
@@ -80,26 +99,12 @@ def getPage():
 		result["data"] = []
 
 		for i in range(len(data)):
-			item = {}
-			item["id"] = data[i][0]
-			item["name"] = data[i][1] 
-			item["category"] = data[i][2]
-			item["description"] = data[i][3]
-			item["address"] = data[i][4]	
-			item["transport"] = data[i][5]	
-			item["mrt"] = data[i][6]	    
-			item["lat"] = data[i][7]
-			item["lng"] = data[i][8]	
-			item["images"] = data[i][9].split(',')
-			result["data"].append(item)
-		response = make_response(result)
-		response.headers["Content-Type"] = "application/json; charset=utf-8"
-		return response, 200
+			result["data"].append(dataSetting(data[i]))
+			
+		return responseWithHeaders(result), 200
 
 	except Exception as e:
-		result["error"] = True
-		result["message"] = e.__class__.__name__+": "+str(e.args[0])
-		return result, 500
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
 
 
 @app.route("/api/attraction/<int:attractionId>",methods=['GET'])
@@ -120,29 +125,13 @@ def getAttraction(attractionId):
 		con.close()
 
 		if (data == None):
-			result["error"] = True
-			result["message"] = "景點編號不正確"
-			return result, 400
+			return error(result,"景點編號不正確") , 400
 
-		result["data"] = {}
-		result["data"]["id"] = data[0]
-		result["data"]["name"] = data[1] 
-		result["data"]["category"] = data[2]
-		result["data"]["description"] = data[3]
-		result["data"]["address"] = data[4]	
-		result["data"]["transport"] = data[5]	
-		result["data"]["mrt"] = data[6]	    
-		result["data"]["lat"] = data[7]
-		result["data"]["lng"] = data[8]	
-		result["data"]["images"] = data[9].split(',')
-		response = make_response(result)
-		response.headers["Content-Type"] = "application/json; charset=utf-8"
-		return response, 200
+		result["data"] = dataSetting(data)
+		return responseWithHeaders(result), 200
 
 	except Exception as e:
-		result["error"] = True
-		result["message"] = e.__class__.__name__+": "+str(e.args[0])
-		return result, 500
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
 
 @app.route("/api/mrts",methods=['GET'])
 def getMrts():
@@ -160,15 +149,11 @@ def getMrts():
 		result["data"] = []
 		for i in range(len(data)):
 			if (data[i][1] != None):
-				result["data"].append(data[i][1])
-		response = make_response(result)
-		response.headers["Content-Type"] = "application/json; charset=utf-8"
-		return response, 200
+				result["data"].append(data[i][1])		
+		return responseWithHeaders(result), 200
 
 	except Exception as e:
-		result["error"] = True
-		result["message"] = e.__class__.__name__+": "+str(e.args[0])
-		return result, 500
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
 	
 @app.route("/api/user",methods=['POST'])
 def signup():
@@ -180,9 +165,7 @@ def signup():
 		password = data['password'].strip()
 
 		if not name or not email or not password:
-			result["error"] = True
-			result["message"] = "註冊失敗：欄位皆為必填"
-			return result, 400
+			return error(result,"註冊失敗：欄位皆為必填"), 400
 		
 		con = conPool.get_connection()
 		cursor = con.cursor()
@@ -191,22 +174,20 @@ def signup():
 		data = cursor.fetchone()
 
 		if data != None:
-			result["error"] = True
-			result["message"] = "註冊失敗：email已註冊過"
-			return result, 400
+			cursor.close()
+			con.close()
+			return error(result,"註冊失敗：email已註冊過"), 400
 		else:
 			cursor.execute("INSERT INTO member (name, email, password) VALUES (%s, %s, %s)",(name, email, password))
 			con.commit()
+			cursor.close()
+			con.close()
+
 			result["ok"] = True
 			return result, 200
 
-		cursor.close()
-		con.close()
-
 	except Exception as e:
-		result["error"] = True
-		result["message"] = e.__class__.__name__+": "+str(e.args[0])
-		return result, 500
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
 
 @app.route("/api/user/auth",methods=['PUT'])
 def signin():
@@ -217,9 +198,7 @@ def signin():
 		password = data["password"].strip()
 
 		if not email or not password:
-			result["error"] = True
-			result["message"] = "登入失敗：欄位皆為必填"
-			return result, 400
+			return error(result,"登入失敗：欄位皆為必填"), 400
 
 		con = conPool.get_connection()
 		cursor = con.cursor()
@@ -231,9 +210,7 @@ def signin():
 		con.close()
 
 		if ( data == None):
-			result["error"] = True
-			result["message"] = "登入失敗：帳號或密碼錯誤"
-			return result, 400
+			return error(result,"登入失敗：帳號或密碼錯誤"), 400
 		else:
 			payload = {}
 			payload["id"] = data[0]
@@ -245,9 +222,7 @@ def signin():
 			return result, 200
 
 	except Exception as e:
-		result["error"] = True
-		result["message"] = e.__class__.__name__+": "+str(e.args[0])
-		return result, 500
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
 
 @app.route("/api/user/auth",methods=['GET'])
 def getStatus():
@@ -264,5 +239,113 @@ def getStatus():
 	except:
 		result["data"] = None
 		return result, 200
+
+@app.route("/api/booking",methods=['POST'])
+def bookingAPI():
+	result = {}
+	try:
+		try:
+			token = request.headers['Authorization'][7:]
+			userInfo = jwt.decode(token, key, algorithms="HS256")
+		except:
+			return error(result,"未登入系統，拒絕存取"), 403
+
+		data = request.get_json()
+		memberId = userInfo["id"]
+		attractionId = data['attractionId']
+		date = data['date']
+		time = data['time']
+		price = data['price']
+
+		if not memberId or not attractionId or not date or not time or not price:
+			return error(result,"建立失敗，輸入不正確或其他原因"), 400
+
+		con = conPool.get_connection()
+		cursor = con.cursor()
+
+		cursor.execute("SELECT* FROM booking WHERE memberId=%s",(memberId,))
+		data = cursor.fetchone()
+
+		if data != None:
+			cursor.execute("DELETE FROM booking WHERE memberId=%s",(memberId,))
+			con.commit()
+
+		cursor.execute("INSERT INTO booking (memberId, attractionId, date, time, price) VALUES (%s, %s, %s, %s, %s)",(memberId, attractionId, date, time, price))
+		con.commit()
+
+		cursor.close()
+		con.close()
+
+		result["ok"] = True
+		return result, 200
+		
+	except Exception as e:
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+
+@app.route("/api/booking",methods=['GET'])
+def getBooking():
+	result = {}
+	try:
+		try:
+			token = request.headers['Authorization'][7:]
+			userInfo = jwt.decode(token, key, algorithms="HS256")
+		except:
+			return error(result,"未登入系統，拒絕存取"), 403
+
+		try:
+			memberId = userInfo["id"]
+			con = conPool.get_connection()
+			cursor = con.cursor()
+			
+			sql = "SELECT booking.attractionId,main.name, main.address, image.images, booking.date, booking.time, booking.price FROM booking LEFT JOIN main ON booking.attractionId = main.id LEFT JOIN image ON booking.attractionId = image.attraction_id WHERE booking.memberId = %s ORDER BY image.id LIMIT 1"
+
+			cursor.execute(sql,(memberId,))
+			data = cursor.fetchone()
+
+			cursor.close()
+			con.close()
+
+			result["data"] ={}
+			result["data"]["attraction"] = {}
+			result["data"]["attraction"]["id"] = data[0]
+			result["data"]["attraction"]["name"] = data[1]
+			result["data"]["attraction"]["address"] = data[2]
+			result["data"]["attraction"]["image"] = data[3]
+			result["data"]["date"] = data[4]
+			result["data"]["time"] = data[5]
+			result["data"]["price"] = data[6]
+			return result, 200		
+		except:
+			result["data"] = None
+			return result, 200
+
+	except Exception as e:
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+
+@app.route("/api/booking",methods=['DELETE'])
+def deleteBooking():
+	result = {}
+	try:
+		try:
+			token = request.headers['Authorization'][7:]
+			userInfo = jwt.decode(token, key, algorithms="HS256")
+		except:
+			return error(result,"未登入系統，拒絕存取"), 403
+
+		memberId = userInfo["id"]
+		con = conPool.get_connection()
+		cursor = con.cursor()
+		
+		cursor.execute("DELETE FROM booking WHERE memberId=%s",(memberId,))
+		con.commit()
+
+		cursor.close()
+		con.close()
+
+		result["ok"] = True
+		return result, 200
+
+	except:
+		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
 
 app.run(host="0.0.0.0", port=3000)
