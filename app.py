@@ -263,13 +263,6 @@ def bookingAPI():
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
-		# cursor.execute("SELECT* FROM booking WHERE memberId=%s",(memberId,))
-		# data = cursor.fetchone()
-
-		# if data != None:
-		# 	cursor.execute("DELETE FROM booking WHERE memberId=%s",(memberId,))
-		# 	con.commit()
-
 		cursor.execute("INSERT INTO booking (memberId, attractionId, date, time, price) VALUES (%s, %s, %s, %s, %s)",(memberId, attractionId, date, time, price))
 		con.commit()
 
