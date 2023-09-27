@@ -1236,7 +1236,7 @@
   .booking-section {
     width: calc(100% - 20px);
     /* height: 200px; */
-    margin: 0 auto;
+    margin: 10px auto;
     display: flex;
     justify-content: space-between;
   }
@@ -1371,6 +1371,7 @@
     border-radius: 5px;
     box-shadow: 1px 0 #E8E8E8, -1px 0 #E8E8E8, 0 1px #E8E8E8, 0 -1px #E8E8E8;
     border: 0;
+    outline: none;
 
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
@@ -1390,6 +1391,7 @@
     border-radius: 5px;
     box-shadow: 1px 0 #E8E8E8, -1px 0 #E8E8E8, 0 1px #E8E8E8, 0 -1px #E8E8E8;
     border: 0;
+    outline: none;
 
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;

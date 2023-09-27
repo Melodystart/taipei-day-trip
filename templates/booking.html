@@ -11,21 +11,8 @@
 <div class="headline">您好，<span class="userName"></span>，待預訂的行程如下：</div>
 
 <div class="booking-content">
-  <div class="booking-container">
-    <div class="booking-section">
-      <div class="booking-picture">
-        <img class="booking-img" src="">
-      </div>
-      <div class="booking-info">
-        <div class="delete"><img src="/picture/delete.png"></div>
-        <div class="booking-info-title">台北一日遊：<span class="booking-info-attraction"></span></div>
-        <div class="booking-info-item">日期：<span class="booking-info-date"></span></div>
-        <div class="booking-info-item">時間：<span class="booking-info-time"></span></div>
-        <div class="booking-info-item">費用：<span class="booking-info-price"></span></div>
-        <div class="booking-info-item" id="booking-address">地點：<span class="booking-info-address"></span></div>
-      </div>
+  <div class="booking-container" id="booking-list">
 
-    </div>
   </div>
 
   <div class="separator-booking" id="separator-shorten">
@@ -100,26 +87,42 @@
             document.querySelector(".booking-content").style.display = "none";
             document.querySelector(".attraction-footer").style.height = "100%";
           } else {
-
             document.querySelector(".booking-content").style.display = "block";
             document.querySelector(".booking-none").style.display = "none";
+            let total = 0;
 
-            const date = new Date(responseJson["data"]["date"]);
-            document.querySelector(".booking-info-date").textContent = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0")
+            responseJson["data"].forEach(data => {
 
-            let time = "早上9點到中午12點"
-            if (responseJson["data"]["time"] == "afternoon") { time = "下午1點到下午4點" }
-            document.querySelector(".booking-info-time").textContent = time;
+              const order = document.createElement("div");
+              order.classList.add("booking-section");
 
-            document.querySelector(".booking-img").src = responseJson["data"]["attraction"]["image"];
-            document.querySelector(".booking-info-attraction").textContent = responseJson["data"]["attraction"]["name"];
-            document.querySelector(".booking-info-price").textContent = "新台幣 " + responseJson["data"]["price"] + " 元";
-            document.querySelector(".booking-info-address").textContent = responseJson["data"]["attraction"]["address"];
+              let time = "早上9點到中午12點";
+              if (data["time"] == "afternoon") { time = "下午1點到下午4點"; }
+              let date = new Date(data["date"]);
+              date = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0");
+              total += data["price"];
+
+              order.innerHTML = `
+              <div class="booking-section">
+                <div class="booking-picture">
+                  <img class="booking-img" src="${data["attraction"]["image"]}">
+                </div>
+                <div class="booking-info">
+                  <div class="delete" onclick="deleteBooking('${data["bookingId"]}');"><img src="/picture/delete.png"></div>
+                  <div class="booking-info-title">台北一日遊：<span class="booking-info-attraction">${data["attraction"]["name"]}</span></div>
+                  <div class="booking-info-item">日期：<span class="booking-info-date">${date}</span></div>
+                  <div class="booking-info-item">時間：<span class="booking-info-time">${time}</span></div>
+                  <div class="booking-info-item">費用：<span class="booking-info-price">新台幣 ${data["price"]} 元</span></div>
+                  <div class="booking-info-item" id="booking-address">地點：<span class="booking-info-address">${data["attraction"]["address"]}</span></div>
+                </div>
+              </div>
+              `
+              document.querySelector("#booking-list").appendChild(order)
+            })
 
             document.querySelector(".contact-name").value = userInfo["name"];
             document.querySelector(".contact-email").value = userInfo["email"];
-
-            document.querySelector(".booking-total").textContent = "總價：新台幣 " + responseJson["data"]["price"] + " 元";
+            document.querySelector(".booking-total").textContent = "總價：新台幣 " + total + " 元";
           }
         })
 
@@ -127,7 +130,7 @@
 
   }
 
-  function deleteBooking() {
+  function deleteBooking(bookingId) {
 
     /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
     getStatus().then(userInfo => {
@@ -142,6 +145,9 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
+        body: JSON.stringify({
+          bookingId: bookingId,
+        })
       }
 
       fetch('/api/booking', deleteMethod)
@@ -159,10 +165,10 @@
 
   getBooking();
 
-  const deleteBtn = document.querySelector(".delete");
-  deleteBtn.addEventListener("click", () => {
-    deleteBooking();
-  })
+  // const deleteBtn = document.querySelector(".delete");
+  // deleteBtn.addEventListener("click", () => {
+  //   deleteBooking();
+  // })
 
 </script>
 {% endblock %}
