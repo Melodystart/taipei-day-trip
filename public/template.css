@@ -6,7 +6,8 @@
   body {
     margin: 0;
     height: 100%;
-    /* width: 1920px; */
+    overflow-y: auto;
+    /*原設定body的height: 100%會使得navigation的position: sticky失效，加上overflow-y: auto可解決此問題*/
   }
 
   .navigation {
@@ -477,7 +478,7 @@
     width: 234px;
     height: 24px;
     padding: 5px 0px 5px 0px;
-    position: absolute;
+    /* position: absolute; */
   }
 
   .copyright {
@@ -1209,7 +1210,31 @@
     align-items: center;
   }
 
-  .booking-none {
+  .main-words {
+    padding: 10px 0 10px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .thank-main {
+    display: flex;
+    justify-content: center;
+  }
+
+  .thank-container {
+    padding: 20px;
+    margin: 0 auto;
+  }
+
+  .sub-words {
+    height: 27px;
+    padding: 10px 0 10px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .booking-none,
+  .sub-words {
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
     font-weight: 500;
@@ -1223,11 +1248,12 @@
   }
 
   .headline,
+  .main-words,
   .userName {
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 19px;
     font-weight: 700;
-    line-height: 16px;
+    /* line-height: 16px; */
     letter-spacing: 0em;
     text-align: left;
     color: #666666;
@@ -1382,9 +1408,9 @@
     color: #000000;
   }
 
-  .card-number,
-  .card-expire,
-  .card-code {
+  #card-number,
+  #card-expiration-date,
+  #card-ccv {
     width: 200px;
     height: 18px;
     padding: 10px;
@@ -1465,6 +1491,13 @@
     color: #FFFFFF;
     border: none;
     cursor: pointer;
+  }
+
+  .tappay-field-focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
   }
 
 }
@@ -2696,7 +2729,7 @@
     width: 234px;
     height: 24px;
     padding: 5px 0px 5px 0px;
-    position: absolute;
+    /* position: absolute; */
   }
 
   .copyright {
@@ -2725,8 +2758,10 @@
   .attraction-section {
     width: 100%;
     height: 100%;
-    /* display: block; 待研究*/
+    /* display: block; 
+    block：若父元素長度 < 子元素長度加總，外部長度仍為父元素長度；反之，則外部長度為子元素長度加總 */
     display: inline;
+    /*inline的長寬為自適應，無法也無須另做設定*/
     padding: 0px;
   }
 

@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="../template.css">
+{% endblock %}
+
+{% block main %}
+<div class="separator-nav">
+</div>
+<div class="thank-main">
+  <div class="thank-container">
+    <div class="main-words" id="msg"></div>
+    <div class="main-words" id="orderId"></div>
+    <div class="sub-words">如有疑問請提供訂單編號洽詢專人</div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+  document.querySelector(".attraction-footer").style.height = "100%";
+  const words = decodeURIComponent(window.location.search).split("&");
+  const orderId = words[0].slice(words[0].indexOf("=") + 1);
+  const msg = words[1].slice(words[1].indexOf("=") + 1);
+  if (msg === "付款成功") {
+    document.querySelector("#msg").textContent = msg + "：祝您旅途愉快!";
+  } else {
+    document.querySelector("#msg").textContent = msg;
+  }
+  document.querySelector("#orderId").textContent = "訂單編號：" + orderId;
+</script>
+{% endblock %}
