@@ -21,9 +21,9 @@
   <div class="booking-container">
     <div class="contact-form">
       <div class="contact-form-title">您的聯絡資訊</div>
-      <div class="contact-form-item">聯絡姓名：<input class="contact-name"></div>
-      <div class="contact-form-item">聯絡信箱：<input class="contact-email"></div>
-      <div class="contact-form-item">手機號碼：<input class="contact-phone"></div>
+      <div class="contact-form-item">聯絡姓名：<input class="contact-name" required></div>
+      <div class="contact-form-item">聯絡信箱：<input class="contact-email" required></div>
+      <div class="contact-form-item" id="phone-text">手機號碼：<input class="contact-phone" required></div>
       <div class="contact-form-item" id="contact-notice"><span
           class="contact-notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</span></div>
     </div>
@@ -35,9 +35,21 @@
   <div class="booking-container">
     <div class="contact-form">
       <div class="contact-form-title">信用卡付款資訊</div>
-      <div class="contact-form-item">卡片號碼：<input class="card-number" placeholder="**** **** **** ****"></div>
-      <div class="contact-form-item">過期時間：<input class="card-expire" placeholder="MM / YY"></div>
-      <div class="contact-form-item">驗證密碼：<input class="card-code" placeholder="CVV"></div>
+      <style>
+        .tpfield {
+          height: 40px;
+          width: 300px;
+          border: 1px solid gray;
+          margin: 5px 0;
+          padding: 5px;
+        }
+      </style>
+      <div class="contact-form-item" id="card-text">卡片號碼：<div class="tpfield" id="card-number"></div>
+      </div>
+      <div class="contact-form-item" id="expiry-text">過期時間：<div class="tpfield" id="card-expiration-date"></div>
+      </div>
+      <div class="contact-form-item" id="cvv-text">驗證密碼：<div class="tpfield" id="card-ccv"></div>
+      </div>
     </div>
   </div>
 
@@ -48,7 +60,7 @@
     <div class="booking-confirm">
       <div class="booking-total"></div>
       <div class="booking-submit-container">
-        <button class="booking-submit-button">確認訂購並付款</button>
+        <button class="booking-submit-button" onclick="onSubmit(event)">確認訂購並付款</button>
       </div>
     </div>
   </div>
@@ -59,6 +71,8 @@
 
 
 {% block js %}
+<script src="https://js.tappaysdk.com/sdk/tpdirect/v5.17.0"></script>
+<script> TPDirect.setupSDK(137040, 'app_A5irhTpBsKs7Os61mCRlcW4MmVYfJu2AZEMdBvOyjKhScgAPuwQATTmP3Sto', 'sandbox') </script>
 <script>
   function getBooking() {
 
@@ -89,7 +103,6 @@
           } else {
             document.querySelector(".booking-content").style.display = "block";
             document.querySelector(".booking-none").style.display = "none";
-            let total = 0;
 
             responseJson["data"].forEach(data => {
 
@@ -118,6 +131,18 @@
               </div>
               `
               document.querySelector("#booking-list").appendChild(order)
+              let item = {}
+              item["price"] = data["price"]
+              item["trip"] = {}
+              item["trip"]["attraction"] = {}
+              item["trip"]["attraction"]["id"] = data["attraction"]["id"]
+              item["trip"]["attraction"]["name"] = data["attraction"]["name"]
+              item["trip"]["attraction"]["address"] = data["attraction"]["address"]
+              item["trip"]["attraction"]["image"] = data["attraction"]["image"]
+              item["trip"]["date"] = date
+              item["trip"]["time"] = data["time"]
+              orders.push(item)
+              bookingIdList.push(data["bookingId"])
             })
 
             document.querySelector(".contact-name").value = userInfo["name"];
@@ -163,8 +188,181 @@
 
   }
 
+  let total = 0;
+  let orders = [];
+  let bookingIdList = [];
   getBooking();
 
+  const submitButton = document.querySelector(".booking-submit-button")
+
+  let fields = {
+    number: {
+      element: '#card-number',
+      placeholder: '**** **** **** ****'
+    },
+    expirationDate: {
+      element: document.getElementById('card-expiration-date'),
+      placeholder: 'MM / YY'
+    },
+    ccv: {
+      element: '#card-ccv',
+      placeholder: 'ccv'
+    }
+  }
+
+  TPDirect.card.setup({
+    fields: fields,
+    styles: {
+      'input': {
+        'color': 'gray'
+      },
+      'input.ccv': {
+        'font-size': '16px'
+      },
+      'input.expiration-date': {
+        'font-size': '16px'
+      },
+      'input.card-number': {
+        'font-size': '16px'
+      },
+      ':focus': {
+        'color': 'black'
+      },
+      // style valid state
+      '.valid': {
+        'color': 'green'
+      },
+      // style invalid state
+      '.invalid': {
+        'color': 'red'
+      },
+      // Note that these apply to the iframe, not the root window.
+      '@media screen and (max-width: 400px)': {
+        'input': {
+          'color': 'orange'
+        }
+      }
+    },
+    // 此設定會顯示卡號輸入正確後，會顯示前六後四碼信用卡卡號
+    isMaskCreditCardNumber: true,
+    maskCreditCardNumberRange: {
+      beginIndex: 6,
+      endIndex: 11
+    }
+  })
+
+  TPDirect.card.onUpdate(function (update) {
+
+    if (update.cardType === 'unionpay') {
+      alert("不好意思，目前無法使用銀聯卡")
+      return
+    }
+    // number 欄位輸入提醒
+    if (update.status.number === 2) {
+      document.getElementById("card-text").style.color = "red";
+    } else if (update.status.number === 0) {
+      document.getElementById("card-text").style.color = "green";
+    } else {
+      document.getElementById("card-text").style.color = "#666666";
+    }
+    // expiry 欄位輸入提醒
+    if (update.status.expiry === 2) {
+      document.getElementById("expiry-text").style.color = "red";
+    } else if (update.status.expiry === 0) {
+      document.getElementById("expiry-text").style.color = "green";
+    } else {
+      document.getElementById("expiry-text").style.color = "#666666";
+    }
+    // cvv 欄位輸入提醒
+    if (update.status.ccv === 2) {
+      document.getElementById("cvv-text").style.color = "red";
+    } else if (update.status.ccv === 0) {
+      document.getElementById("cvv-text").style.color = "green";
+    } else {
+      document.getElementById("cvv-text").style.color = "#666666";
+    }
+
+    update.canGetPrime === true
+    // --> you can call TPDirect.card.getPrime()
+    if (update.canGetPrime) {
+      // Enable submit Button to get prime.
+      submitButton.removeAttribute('disabled')
+      submitButton.style.cursor = 'pointer';
+      if (document.querySelector(".contact-phone").value === "") {
+        document.querySelector("#phone-text").style.color = "red";
+        alert("請填手機號碼")
+        return
+      }
+    } else {
+      // Disable submit Button to get prime.
+      submitButton.setAttribute('disabled', true)
+      submitButton.style.cursor = 'not-allowed';
+    }
+  })
+
+  function onSubmit(event) {
+    // 送出訂單後，按鈕禁止再次點擊，避免重複付款
+    submitButton.setAttribute('disabled', true);
+    submitButton.style.cursor = 'not-allowed';
+    event.preventDefault()
+
+    // 取得 TapPay Fields 的 status
+    const tappayStatus = TPDirect.card.getTappayFieldsStatus()
+
+    // 確認是否可以 getPrime
+    if (tappayStatus.canGetPrime === false) {
+      alert('請確認卡號資料是否輸入正確');
+      return
+    }
+
+    if (tappayStatus.cardType === 'unionpay') {
+      alert("不好意思，目前無法使用銀聯卡")
+      return
+    }
+
+    // Get prime
+    TPDirect.card.getPrime((result) => {
+      if (result.status !== 0) {
+        alert('get prime error ' + result.msg);
+        return
+      }
+      let contact = {}
+      contact["name"] = document.querySelector(".contact-name").value;
+      contact["email"] = document.querySelector(".contact-email").value;
+      contact["phone"] = document.querySelector(".contact-phone").value;
+
+      let order = {}
+      order["details"] = orders;
+      order["contact"] = contact;
+      order["amount"] = total;
+      order["bookingIdList"] = bookingIdList;
+
+      const postMethod = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify({
+          prime: result.card.prime,
+          order: order
+        })
+      }
+
+      fetch('/api/orders', postMethod)
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson["error"]) {
+            submitButton.removeAttribute('disabled')
+            submitButton.style.cursor = 'pointer';
+            return alert(responseJson["message"])
+          }
+
+          window.location.href = '/thankyou?number=' + responseJson["data"]["number"] + '&msg=' + responseJson["data"]["payment"]["message"]
+        })
+        .catch(error => console.error("Error:", error))
+    })
+  }
 
 </script>
 {% endblock %}

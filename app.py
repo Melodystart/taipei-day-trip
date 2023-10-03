@@ -1,3 +1,4 @@
+import time
 import mysql.connector
 from mysql.connector import pooling
 import math
@@ -104,7 +105,7 @@ def getPage():
 		return responseWithHeaders(result), 200
 
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+		return error(result, e.__class__.__name__+": "+str(e)), 500
 
 
 @app.route("/api/attraction/<int:attractionId>",methods=['GET'])
@@ -131,7 +132,7 @@ def getAttraction(attractionId):
 		return responseWithHeaders(result), 200
 
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+		return error(result, e.__class__.__name__+": "+str(e)), 500
 
 @app.route("/api/mrts",methods=['GET'])
 def getMrts():
@@ -153,7 +154,7 @@ def getMrts():
 		return responseWithHeaders(result), 200
 
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+		return error(result, e.__class__.__name__+": "+str(e)), 500
 	
 @app.route("/api/user",methods=['POST'])
 def signup():
@@ -187,7 +188,7 @@ def signup():
 			return result, 200
 
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+		return error(result, e.__class__.__name__+": "+str(e)), 500
 
 @app.route("/api/user/auth",methods=['PUT'])
 def signin():
@@ -222,7 +223,7 @@ def signin():
 			return result, 200
 
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+		return error(result, e.__class__.__name__+": "+str(e)), 500
 
 @app.route("/api/user/auth",methods=['GET'])
 def getStatus():
@@ -273,7 +274,7 @@ def bookingAPI():
 		return result, 200
 		
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+		return error(result, e.__class__.__name__+": "+str(e)), 500
 
 @app.route("/api/booking",methods=['GET'])
 def getBooking():
@@ -289,7 +290,7 @@ def getBooking():
 		con = conPool.get_connection()
 		cursor = con.cursor()
 		
-		sql = "SELECT booking.attractionId,main.name, main.address, (SELECT GROUP_CONCAT(image.images) FROM image WHERE image.attraction_id = main.id) AS imagescombined, booking.date, booking.time, booking.price, booking.id FROM booking LEFT JOIN main ON booking.attractionId = main.id LEFT JOIN image ON booking.attractionId = image.attraction_id WHERE booking.memberId = %s GROUP BY booking.id"
+		sql = "SELECT booking.attractionId,main.name, main.address, (SELECT GROUP_CONCAT(image.images) FROM image WHERE image.attraction_id = main.id) AS imagescombined, booking.date, booking.time, booking.price, booking.id, booking.paymentStatus FROM booking LEFT JOIN main ON booking.attractionId = main.id LEFT JOIN image ON booking.attractionId = image.attraction_id WHERE booking.memberId = %s AND booking.paymentStatus = '未付款' GROUP BY booking.id"
 
 		cursor.execute(sql,(memberId,))
 		data = cursor.fetchall()
@@ -317,7 +318,7 @@ def getBooking():
 		return result, 200		
 
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+		return error(result, e.__class__.__name__+": "+str(e)), 500
 
 @app.route("/api/booking",methods=['DELETE'])
 def deleteBooking():
@@ -345,6 +346,120 @@ def deleteBooking():
 		return result, 200
 
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e.args[0])), 500
+		return error(result, e.__class__.__name__+": "+str(e)), 500
+
+@app.route("/api/orders",methods=['POST'])
+def orders():
+	result = {}
+	try:
+		token = request.headers['Authorization'][7:]
+		userInfo = jwt.decode(token, key, algorithms="HS256")
+	except:
+		return error(result,"未登入系統，拒絕存取"), 403
+
+	try:
+		try:
+			data = request.get_json()
+			memberId = userInfo["id"]
+			prime = data['prime']
+			amount = data['order']['amount']
+			contactName = data['order']['contact']['name']
+			contactEmail = data['order']['contact']['email']
+			contactPhone = data['order']['contact']['phone']
+			bookingIdList = data['order']["bookingIdList"]
+			orderId = str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + str(memberId)
+
+			if not memberId or not prime or not amount or not contactName or not contactEmail or not contactPhone or not bookingIdList or not orderId:
+				return error(result,"訂單建立失敗，輸入不正確/不完整或其他原因"), 400
+
+			con = conPool.get_connection()
+			cursor = con.cursor()
+
+			for bookingId in bookingIdList:
+				cursor.execute("SELECT * FROM booking WHERE paymentStatus=%s AND id=%s",("已付款",bookingId))
+				data = cursor.fetchone()
+				if data != None:
+					cursor.close()
+					con.close()
+					return error(result,"訂單建立失敗，此訂單含已付過款行程，請重新整理預定行程頁面"), 400
+				
+			cursor.execute("INSERT INTO orders (orderId,memberId, paymentStatus, amount, contactName, contactEmail, contactPhone) VALUES (%s, %s, %s, %s, %s, %s, %s)",(orderId, memberId, "未付款", amount, contactName,contactEmail, contactPhone))
+			con.commit()
+
+			for bookingId in bookingIdList:
+				cursor.execute("UPDATE booking set orderId=%s WHERE id = %s and memberId= %s",(orderId, bookingId, memberId))
+				con.commit()
+
+			cursor.close()
+			con.close()
+		except Exception as e:
+			return error(result, "訂單建立失敗，輸入不正確或其他原因"+e.__class__.__name__+": "+str(e)), 400
+
+		partner_key = 'partner_NqF3u1pTphB2ariDyIUM6Pl4n6ghMkHB0sVgbiwkVsN9WsFYBwVKRdWN'
+		merchant_id = 'start99start_CTBC'
+
+		url = 'https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime'
+		headers = {'Content-Type': 'application/json','x-api-key': partner_key}
+
+		payment_details = {
+			"prime": prime,
+			"partner_key": partner_key,
+			"merchant_id": merchant_id,
+			"details":"台北一日遊",
+			"amount": amount,
+			"order_number": orderId,
+			"cardholder": {
+					"phone_number": contactPhone,
+					"name": contactName,
+					"email": contactEmail,
+					"zip_code": "100",
+					"address": "台北市天龍區芝麻街1號1樓",
+					"national_id": "A123456789"
+			},
+			"remember": False
+		}
+
+		r = requests.post(url, json=payment_details, headers=headers).json()
+		print(r)
+
+		result["data"] = {}
+		result["data"]["number"] = orderId
+		result["data"]["payment"] = {}
+		result["data"]["payment"]["status"] = r["status"]
+
+		con = conPool.get_connection()
+		cursor = con.cursor()
+
+		if int(r["status"]) == 0:
+			if r["order_number"] != orderId:
+				cursor.execute("UPDATE orders set paymentStatus=%s, statusCode=%s, msg=%s, rec_trade_id =%s WHERE orderId = %s and memberId= %s",("付款異常", r["status"], r["msg"], r["rec_trade_id"], orderId, memberId))
+				con.commit()
+				
+				cursor.close()
+				con.close()
+				return error(result,"付款訂單號碼與回傳訂單號碼不符，請聯絡專人處理"), 500
+
+			cursor.execute("UPDATE orders set paymentStatus=%s, statusCode=%s, msg=%s, rec_trade_id =%s WHERE orderId = %s and memberId= %s",("已付款", r["status"], r["msg"], r["rec_trade_id"], orderId, memberId))
+			con.commit()
+
+			for bookingId in bookingIdList:
+				cursor.execute("UPDATE booking set paymentStatus=%s WHERE id = %s and memberId= %s",('已付款', bookingId, memberId))
+				con.commit()
+
+			cursor.close()
+			con.close()
+			result["data"]["payment"]["message"] = "付款成功"
+			return result, 200
+		else:
+			cursor.execute("UPDATE orders set statusCode=%s, msg=%s, rec_trade_id =%s WHERE orderId = %s and memberId= %s",(r["status"], r["msg"], r["rec_trade_id"], orderId, memberId))
+			con.commit()
+
+			cursor.close()
+			con.close()
+			result["data"]["payment"]["message"] = "付款失敗："+ r["msg"]
+			return result, 200
+
+	except Exception as e:
+		return error(result, e.__class__.__name__+": "+str(e)), 500	
 
 app.run(host="0.0.0.0", port=3000)
