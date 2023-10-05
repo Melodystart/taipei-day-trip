@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="../template.css">
+{% endblock %}
+
+{% block main %}
+<div class="separator-nav">
+</div>
+
+<div class="headline">
+  <div>訂單編號：<span class="userName" id="orderNumber"></span></div>
+  <div><span class="userName" id="orderMsg"></span></div>
+</div>
+
+<div class="booking-content">
+  <div class="booking-container" id="booking-list">
+
+  </div>
+
+  <div class="booking-container">
+    <div class="booking-confirm">
+      <div class="booking-total"></div>
+    </div>
+  </div>
+
+  <div class="separator-booking" id="separator-shorten">
+  </div>
+
+  <div class="booking-container">
+    <div class="contact-form">
+      <div class="contact-form-title">您的聯絡資訊</div>
+      <div class="contact-form-item">聯絡姓名：<span class="contact-name"></span></div>
+      <div class="contact-form-item">聯絡信箱：<span class="contact-email"></span></div>
+      <div class="contact-form-item" id="phone-text">手機號碼：<span class="contact-phone"></span></div>
+      <div class="contact-form-item" id="contact-notice"><span class="contact-notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫。</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+  function getOrder(orderNumber) {
+
+    /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+    getStatus().then(userInfo => {
+
+      if (userInfo === null) {
+        window.location.href = '/'
+      };
+
+      const getMethod = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+      }
+
+      fetch('/api/order/' + orderNumber, getMethod)
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson["data"] === null) {
+            window.location.href = '/'
+          } else {
+            document.querySelector(".booking-content").style.display = "block";
+
+            responseJson["data"]["details"].forEach(data => {
+
+              const order = document.createElement("div");
+              order.classList.add("booking-section");
+
+              let time = "早上9點到中午12點";
+              if (data["trip"]["time"] == "afternoon") { time = "下午1點到下午4點"; }
+              total += data["price"];
+
+              order.innerHTML = `
+              <div class="booking-section">
+                <div class="booking-picture">
+                  <img class="booking-img" src="${data["trip"]["attraction"]["image"]}">
+                </div>
+                <div class="booking-info">
+                  <div class="booking-info-title">台北一日遊：<span class="booking-info-attraction">${data["trip"]["attraction"]["name"]}</span></div>
+                  <div class="booking-info-item">日期：<span class="booking-info-date">${data["trip"]["date"]}</span></div>
+                  <div class="booking-info-item">時間：<span class="booking-info-time">${time}</span></div>
+                  <div class="booking-info-item">費用：<span class="booking-info-price">新台幣 ${data["price"]} 元</span></div>
+                  <div class="booking-info-item" id="booking-address">地點：<span class="booking-info-address">${data["trip"]["attraction"]["address"]}</span></div>
+                </div>
+              </div>
+              `
+              document.querySelector("#booking-list").appendChild(order)
+            })
+            document.querySelector("#orderNumber").textContent = responseJson["data"]["number"];
+            document.querySelector("#orderMsg").style.color = "red";
+            if (responseJson["data"]["status"] === 0) {
+              document.querySelector("#orderMsg").textContent = "付款成功：祝您旅途愉快!";
+            } else {
+              document.querySelector("#orderMsg").textContent = "付款失敗：" + responseJson["data"]["msg"];
+            }
+
+            document.querySelector(".contact-name").textContent = responseJson["data"]["contact"]["name"];
+            document.querySelector(".contact-email").textContent = responseJson["data"]["contact"]["email"];
+            document.querySelector(".contact-phone").textContent = responseJson["data"]["contact"]["phone"];
+            if (total === responseJson["data"]["amount"]) { document.querySelector(".booking-total").textContent = "總價：新台幣 " + responseJson["data"]["amount"] + " 元"; }
+            document.querySelector(".booking-confirm").style.height = "100%";
+          }
+        })
+
+    })
+
+  }
+
+  const originUrl = location.href;
+  const index = originUrl.search('=') + 1;
+  const orderNumber = Number(originUrl.slice(index));
+  let total = 0;
+  getOrder(orderNumber);
+
+</script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="../template.css">
+{% endblock %}
+
+{% block main %}
+<div class="separator-nav">
+</div>
+<div class="thank-main">
+  <div class="dialog-box" id="profile-box">
+    <div class="decorator-bar">
+    </div>
+    <div class="dialog-main-container">
+      <div class="dialog-main">
+        <div class="dialog-title">會員資料</div>
+        <div class="profile-label">姓名</div>
+        <div class="input"><input type="text" class="input-text" id="profile-name" name="profile-name" required>
+        </div>
+        <div class="profile-label">email</div>
+        <div class="input-email"><input type="text" class="input-text" id="profile-email" name="profile-email" required>
+        </div>
+        <div class="profile-label">密碼</div>
+        <div class="input"><input type="password" class="input-text" id="profile-password" name="profile-password"
+            placeholder="請輸入想更改的密碼">
+        </div>
+        <button class="dialog-button" onclick="update()">修改會員資料</button>
+        <div class="message" id="profile-message"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+  function update() {
+    getStatus()
+      .then(userInfo => {
+
+        if (userInfo === null) {
+          window.location.href = '/'
+        };
+
+        let body = JSON.stringify({
+          name: document.querySelector("#profile-name").value,
+          email: document.querySelector("#profile-email").value,
+        })
+
+        if (document.querySelector("#profile-password").value.trim() !== "") {
+          body = JSON.stringify({
+            name: document.querySelector("#profile-name").value,
+            email: document.querySelector("#profile-email").value,
+            password: document.querySelector("#profile-password").value
+          })
+        }
+
+        const putMethod = {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: body
+        }
+
+        fetch('/api/profile', putMethod)
+          .then(response => response.json())
+          .then(responseJson => {
+            if (responseJson["ok"]) {
+              document.querySelector("#profile-message").textContent = "會員資料已修改成功";
+              document.querySelector("#profile-message").style.display = 'flex';
+              document.querySelector("#profile-box").style.height = '430px';
+            } else {
+              alert(responseJson["message"]);
+            }
+          })
+          .catch(error => console.error("Error:", error))
+
+      })
+      .catch(error => console.error("Error:", error))
+
+  }
+
+
+
+  getStatus()
+    .then(userInfo => {
+
+      if (userInfo === null) {
+        window.location.href = '/'
+      };
+      console.log(userInfo)
+      document.querySelector("#profile-box").style.height = '395px';
+      document.querySelector("#profile-name").value = userInfo["name"];
+      document.querySelector("#profile-email").value = userInfo["email"];
+      document.querySelector("#profile-name").style.color = "black";
+      document.querySelector("#profile-email").style.color = "black";
+      document.querySelector("#profile-password").style.color = "black";
+      document.querySelector("#profile-message").style.display = 'none';
+
+    })
+    .catch(error => console.error("Error:", error))
+
+</script>
+{% endblock %}

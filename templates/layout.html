@@ -25,8 +25,21 @@
           <div class="nav-button2" id="login">
             <span class="nav-button2-text">登入/註冊</span>
           </div>
-          <div class="nav-button2" id="logout">
-            <span class="nav-button2-text">登出系統</span>
+          <div class="member">
+            <div class="nav-button2" id="member-center">
+              <span class="nav-button2-text">會員中心</span>
+            </div>
+            <div class="member-container">
+              <div class="nav-button2" id="booking-quiry">
+                <span class="nav-button2-text" id="booking-quiry-text">訂單查詢</span>
+              </div>
+              <div class="nav-button2" id="member-account">
+                <span class="nav-button2-text" id="member-account-text">我的帳戶</span>
+              </div>
+              <div class="nav-button2" id="logout">
+                <span class="nav-button2-text" id="logout-text">登出</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -71,6 +84,10 @@
     const dialogBox = document.querySelector(".dialog-box");
     const dialogMain = document.querySelector(".dialog-main");
     const message = document.querySelector(".message");
+    const memberCenter = document.querySelector("#member-center");
+    const bookingQuiry = document.querySelector("#booking-quiry");
+    const memberAccount = document.querySelector("#member-account");
+    const logoutBtn = document.querySelector("#logout");
 
     function signup() {
       const username = document.querySelector("#username").value.trim()
@@ -188,13 +205,13 @@
         .then(responseJson => {
 
           if (responseJson["data"] === null) {
-            document.querySelector("#logout").style.display = "none";
+            document.querySelector("#member-center").style.display = "none";
             document.querySelector("#login").style.display = "flex";
             return responseJson["data"]
 
           } else {
             dialog.style.display = "none";
-            document.querySelector("#logout").style.display = "flex";
+            document.querySelector("#member-center").style.display = "flex";
             document.querySelector("#login").style.display = "none";
             document.querySelector("#logout").onclick = function () { logout(); };
             return responseJson["data"];
@@ -226,6 +243,58 @@
           window.location.href = '/booking'
         }
       })
+    })
+
+    memberCenter.addEventListener('mouseenter', () => {
+      document.querySelector(".member-container").style.display = "block";
+    })
+
+    memberCenter.addEventListener('mouseleave', () => {
+      document.querySelector(".member-container").style.display = "none";
+    })
+
+    bookingQuiry.addEventListener('mouseenter', () => {
+      document.querySelector(".member-container").style.display = "block";
+      bookingQuiry.style.background = "#448899";
+      document.querySelector("#booking-quiry-text").style.color = "white";
+    })
+
+    bookingQuiry.addEventListener('mouseleave', () => {
+      document.querySelector(".member-container").style.display = "none";
+      document.querySelector("#booking-quiry-text").style.color = "#666666";
+      bookingQuiry.style.background = "white";
+    })
+
+    bookingQuiry.addEventListener("click", () => {
+      window.location.href = '/orderlist'
+    })
+
+    memberAccount.addEventListener('mouseenter', () => {
+      document.querySelector(".member-container").style.display = "block";
+      memberAccount.style.background = "#448899";
+      document.querySelector("#member-account-text").style.color = "white";
+    })
+
+    memberAccount.addEventListener('mouseleave', () => {
+      document.querySelector(".member-container").style.display = "none";
+      document.querySelector("#member-account-text").style.color = "#666666";
+      memberAccount.style.background = "white";
+    })
+
+    memberAccount.addEventListener("click", () => {
+      window.location.href = '/profile'
+    })
+
+    logoutBtn.addEventListener('mouseenter', () => {
+      document.querySelector(".member-container").style.display = "block";
+      logoutBtn.style.background = "#448899";
+      document.querySelector("#logout-text").style.color = "white";
+    })
+
+    logoutBtn.addEventListener('mouseleave', () => {
+      document.querySelector(".member-container").style.display = "none";
+      document.querySelector("#logout-text").style.color = "#666666";
+      logoutBtn.style.background = "white";
     })
 
   </script>

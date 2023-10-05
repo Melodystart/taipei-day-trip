@@ -70,12 +70,49 @@
   }
 
   .nav-button2 {
-    width: 91px;
+    /* width: 91px; */
     height: 34px;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
+    flex-direction: column;
+    padding: 10px 10px 0 10px;
     cursor: pointer;
+    background-color: white;
+  }
+
+  .member-container {
+    display: none;
+    width: 91px;
+    background-color: white;
+    box-shadow: 1px 1px #E8E8E8, -1px 1px #E8E8E8, 1px -1px white, -1px -1px white;
+  }
+
+  #booking-quiry,
+  #member-account,
+  #logout {
+    padding: 20px 0 0 10px;
+  }
+
+  #payment-status {
+    color: red;
+  }
+
+  .profile-label {
+    width: 280px;
+    height: 22px;
+    margin: 10px 0;
+    padding: 0 15px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    color: #666666;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: center;
   }
 
   .nav-button1-text {
@@ -94,6 +131,8 @@
   .nav-button2-text {
     width: 71px;
     height: 14px;
+    display: flex;
+    justify-content: center;
 
     font-family: 'Noto Sans TC', sans-serif;
     font-size: 16px;
@@ -105,7 +144,7 @@
   }
 
   #login,
-  #logout {
+  #member-center {
     display: none;
   }
 
@@ -239,6 +278,15 @@
     background: #448899;
     border-radius: 0 4px 4px 0;
     position: relative;
+    cursor: pointer;
+  }
+
+  .search-order-bg {
+    width: 30px;
+    height: 30px;
+    background: #448899;
+    border-radius: 2px;
+    /* position: relative; */
     cursor: pointer;
   }
 
@@ -1047,7 +1095,7 @@
 
   .dialog-box {
     width: 340px;
-    margin: 80px 0 0 0;
+    margin: 80px 0 40px 0;
     height: 275px;
     /* top: 80px;
       left: 10px; */
@@ -1123,7 +1171,7 @@
 
   .input-text {
     width: 280px;
-    height: 17px;
+    height: 24px;
     /* top: 15px;
     left: 15px; */
     font-family: 'Noto Sans TC', sans-serif;
@@ -1206,8 +1254,8 @@
   .headline {
     height: 27px;
     padding: 40px 0 30px 0;
-    display: flex;
-    align-items: center;
+    /* display: flex;
+    align-items: center; */
   }
 
   .main-words {
@@ -1529,9 +1577,9 @@
     height: 34px;
     display: flex;
     justify-content: space-between;
-    padding: 10px 0 10px 10px;
+    padding: 10px 0 0px 10px;
     left: 84px;
-    position: absolute;
+    /* position: absolute; */
   }
 
   .slogan {
@@ -2335,9 +2383,9 @@
     height: 34px;
     display: flex;
     justify-content: space-between;
-    padding: 10px 0 10px 10px;
+    padding: 10px 0 0px 10px;
     left: 84px;
-    position: absolute;
+    /* position: absolute; */
   }
 
   .nav-button1-text {
