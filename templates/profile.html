@@ -84,24 +84,26 @@
 
   }
 
+  function getProfile() {
+    getStatus()
+      .then(userInfo => {
 
+        if (userInfo === null) {
+          window.location.href = '/'
+        };
 
-  getStatus()
-    .then(userInfo => {
+        document.querySelector("#profile-name").value = userInfo["name"];
+        document.querySelector("#profile-email").value = userInfo["email"];
+        document.querySelector("#profile-name").style.color = "black";
+        document.querySelector("#profile-email").style.color = "black";
+        document.querySelector("#profile-password").style.color = "black";
+        document.querySelector("#profile-message").style.display = 'none';
 
-      if (userInfo === null) {
-        window.location.href = '/'
-      };
-      console.log(userInfo)
-      document.querySelector("#profile-name").value = userInfo["name"];
-      document.querySelector("#profile-email").value = userInfo["email"];
-      document.querySelector("#profile-name").style.color = "black";
-      document.querySelector("#profile-email").style.color = "black";
-      document.querySelector("#profile-password").style.color = "black";
-      document.querySelector("#profile-message").style.display = 'none';
+      })
+      .catch(error => console.error("Error:", error))
+  }
 
-    })
-    .catch(error => console.error("Error:", error))
+  getProfile();
 
 </script>
 {% endblock %}
