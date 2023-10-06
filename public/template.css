@@ -785,8 +785,27 @@
     align-items: center;
   }
 
-  .date {
+  .placeholder {
     width: 149px;
+    height: 25px;
+    background-color: white;
+    z-index: 100;
+    left: 10px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 13.3px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #000000;
+  }
+
+  .date {
+    width: 173px;
     height: 25px;
     border: 0;
     padding: 0;
@@ -802,15 +821,7 @@
     letter-spacing: 0em;
     text-align: left;
     color: #000000;
-  }
-
-  .calendar {
-    right: 10px;
-    position: absolute;
-    background-image: url("/picture/calendar.png");
-    width: 24px;
-    height: 24px;
-    z-index: 0;
+    z-index: 10;
   }
 
   [class="date"]::placeholder {
@@ -818,12 +829,20 @@
     opacity: 1;
   }
 
-  [type="date"] {
+  /* [type="date"] {
     background: transparent 100% 50% no-repeat;
-  }
+  } */
+
+  /* [type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+  } */
 
   [type="date"]::-webkit-calendar-picker-indicator {
-    opacity: 0;
+    background-image: url('/picture/calendar.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 21.5px;
+    cursor: pointer;
   }
 
   .booking-time {
@@ -2001,7 +2020,7 @@
   }
 
   .date {
-    width: 149px;
+    width: 173px;
     height: 25px;
     border: 0;
     padding: 0;
@@ -2033,13 +2052,13 @@
     opacity: 1;
   }
 
-  [type="date"] {
+  /* [type="date"] {
     background: transparent 100% 50% no-repeat;
-  }
+  } */
 
-  [type="date"]::-webkit-calendar-picker-indicator {
+  /* [type="date"]::-webkit-calendar-picker-indicator {
     opacity: 0;
-  }
+  } */
 
   .booking-time {
     width: 390px;
@@ -2999,7 +3018,7 @@
   }
 
   .date {
-    width: 149px;
+    width: 173px;
     height: 25px;
     border: 0;
     padding: 0;
@@ -3031,13 +3050,13 @@
     opacity: 1;
   }
 
-  [type="date"] {
+  /* [type="date"] {
     background: transparent 100% 50% no-repeat;
-  }
+  } */
 
-  [type="date"]::-webkit-calendar-picker-indicator {
+  /* [type="date"]::-webkit-calendar-picker-indicator {
     opacity: 0;
-  }
+  } */
 
   .booking-time {
     width: 300px;
