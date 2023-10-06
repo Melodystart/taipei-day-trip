@@ -54,7 +54,15 @@ def booking():
 @app.route("/thankyou")
 def thankyou():
 	return render_template("thankyou.html")
-
+@app.route("/orderlist")
+def orderlist():
+	return render_template("orderlist.html")
+@app.route("/order")
+def order():
+	return render_template("order.html")
+@app.route("/profile")
+def profile():
+	return render_template("profile.html")
 # API
 @app.route("/api/attractions",methods=['GET'])
 def getPage():
@@ -232,9 +240,18 @@ def getStatus():
 	try:
 		token = request.headers['Authorization'][7:]
 		userInfo = jwt.decode(token, key, algorithms="HS256")
+
+		con = conPool.get_connection()
+		cursor = con.cursor()
+		sql = "SELECT name, email from member WHERE id = %s"
+		cursor.execute(sql,(userInfo["id"],))
+		data = cursor.fetchone()
+		cursor.close()
+		con.close()
+
 		result["data"]["id"] = userInfo["id"]
-		result["data"]["name"] = userInfo["name"]
-		result["data"]["email"] = userInfo["email"]
+		result["data"]["name"] = data[0]
+		result["data"]["email"] = data[1] 
 		return result, 200		
 
 	except:
@@ -367,7 +384,11 @@ def orders():
 			contactEmail = data['order']['contact']['email']
 			contactPhone = data['order']['contact']['phone']
 			bookingIdList = data['order']["bookingIdList"]
-			orderId = str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + str(memberId)
+			firstImage = data['order']['details'][0]['trip']['attraction']['image']
+			transactionTime = time.localtime()
+			transactionDate = str(time.strftime("%Y/%m/%d %H:%M", transactionTime))
+			orderId = str(time.strftime("%Y%m%d%H%M%S", transactionTime)) + str(memberId)
+			bookingIds = ""
 
 			if not memberId or not prime or not amount or not contactName or not contactEmail or not contactPhone or not bookingIdList or not orderId:
 				return error(result,"訂單建立失敗，輸入不正確/不完整或其他原因"), 400
@@ -382,8 +403,10 @@ def orders():
 					cursor.close()
 					con.close()
 					return error(result,"訂單建立失敗，此訂單含已付過款行程，請重新整理預定行程頁面"), 400
+				bookingIds += str(bookingId) + ","
 				
-			cursor.execute("INSERT INTO orders (orderId,memberId, paymentStatus, amount, contactName, contactEmail, contactPhone) VALUES (%s, %s, %s, %s, %s, %s, %s)",(orderId, memberId, "未付款", amount, contactName,contactEmail, contactPhone))
+			bookingIds = bookingIds.strip(",")
+			cursor.execute("INSERT INTO orders (orderId,memberId, paymentStatus, amount, contactName, contactEmail, contactPhone, bookingIdList, transactionDate, firstImage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",(orderId, memberId, "未付款", amount, contactName,contactEmail, contactPhone, bookingIds, transactionDate, firstImage))
 			con.commit()
 
 			for bookingId in bookingIdList:
@@ -420,7 +443,6 @@ def orders():
 		}
 
 		r = requests.post(url, json=payment_details, headers=headers).json()
-		print(r)
 
 		result["data"] = {}
 		result["data"]["number"] = orderId
@@ -460,6 +482,183 @@ def orders():
 			return result, 200
 
 	except Exception as e:
-		return error(result, e.__class__.__name__+": "+str(e)), 500	
+		return error(result, e.__class__.__name__+": "+str(e)), 500
+
+@app.route("/api/orders",methods=['GET'])
+def getOrders():
+	result = {}
+	try:
+		token = request.headers['Authorization'][7:]
+		userInfo = jwt.decode(token, key, algorithms="HS256")
+	except:
+		return error(result,"未登入系統，拒絕存取"), 403
+
+	try:
+		memberId = userInfo["id"]
+		con = conPool.get_connection()
+		cursor = con.cursor()
+		
+		sql = "SELECT orderId, transactionDate, paymentStatus, amount,  msg, firstImage from orders WHERE memberId = %s"
+
+		cursor.execute(sql,(memberId,))
+		data = cursor.fetchall()
+
+		cursor.close()
+		con.close()
+		result["data"] = []
+
+		if len(data) == 0:
+			result["data"] = None
+			return result, 200
+
+		for i in range(len(data)):
+			item = {}
+			item["orderId"] = data[i][0]
+			item["transactionDate"] = data[i][1]
+			item["paymentStatus"] = data[i][2]
+			item["amount"] = data[i][3]
+			item["msg"] = data[i][4]
+			item["firstImage"] = data[i][5]
+			result["data"].append(item)
+		return result, 200		
+
+	except Exception as e:
+		return error(result, e.__class__.__name__+": "+str(e)), 500
+
+@app.route("/api/order/<int:orderNumber>",methods=['GET'])
+def getOrderDetails(orderNumber):
+	result = {}
+	try:
+		token = request.headers['Authorization'][7:]
+		userInfo = jwt.decode(token, key, algorithms="HS256")
+	except:
+		return error(result,"未登入系統，拒絕存取"), 403
+
+	try:
+		memberId = userInfo["id"]
+		con = conPool.get_connection()
+		cursor = con.cursor()
+		
+		sql = "SELECT bookingIdList, amount, contactName, contactEmail, contactPhone, statusCode, msg from orders WHERE memberId = %s and orderId = %s;"
+
+		cursor.execute(sql,(memberId,orderNumber))
+		data = cursor.fetchone()
+
+		if len(data) == 0:
+			cursor.close()
+			con.close()
+			result["data"] = None
+			return result, 200
+
+		result["data"] = {}
+		result["data"]["number"] = orderNumber
+		result["data"]["amount"] = data[1]
+		result["data"]["contact"] = {}
+		result["data"]["contact"]["name"] = data[2]
+		result["data"]["contact"]["email"] = data[3]
+		result["data"]["contact"]["phone"] = data[4]
+		result["data"]["status"] = data[5]
+		result["data"]["msg"] = data[6]
+		result["data"]["details"] = []
+
+		bookingIdList = data[0].split(',')
+		#待研究：下面查詢只會跑出第一個而無法跑出全部的booking(1,2)，先改成下方以迴圈方式跑出全部的booking
+		# sql = "SELECT booking.price, booking.date, booking.time, booking.attractionId, main.name, main.address, (SELECT GROUP_CONCAT(image.images) FROM image WHERE image.attraction_id = main.id) AS imagescombined FROM booking LEFT JOIN main ON booking.attractionId = main.id LEFT JOIN image ON booking.attractionId = image.attraction_id WHERE booking.memberId = %s AND booking.id IN (%s) GROUP BY booking.id;"
+
+		for i in range(len(bookingIdList)):
+			sql = "SELECT booking.price, booking.date, booking.time, booking.attractionId, main.name, main.address, (SELECT GROUP_CONCAT(image.images) FROM image WHERE image.attraction_id = main.id) AS imagescombined FROM booking LEFT JOIN main ON booking.attractionId = main.id LEFT JOIN image ON booking.attractionId = image.attraction_id WHERE booking.memberId = %s AND booking.id = %s GROUP BY booking.id;"
+
+			cursor.execute(sql,(memberId, bookingIdList[i]))
+			attraction = cursor.fetchone()	
+
+			item = {}
+			item["price"] = attraction[0]
+			item["trip"] = {}
+			item["trip"]["date"] = attraction[1].strftime("%Y-%m-%d")
+			item["trip"]["time"] = attraction[2]
+			item["trip"]["attraction"] = {}
+			item["trip"]["attraction"]["id"] = attraction[3]
+			item["trip"]["attraction"]["name"] = attraction[4]
+			item["trip"]["attraction"]["address"] = attraction[5]
+			item["trip"]["attraction"]["image"] = attraction[6].split(',')[0]
+			result["data"]["details"].append(item)
+
+		cursor.close()
+		con.close()
+		return result, 200		
+
+	except Exception as e:
+		return error(result, e.__class__.__name__+": "+str(e)), 500
+
+@app.route("/api/profile",methods=['PUT'])
+def updateProfile():
+	result = {}
+	try:
+		token = request.headers['Authorization'][7:]
+		userInfo = jwt.decode(token, key, algorithms="HS256")
+	except:
+		return error(result,"未登入系統，拒絕存取"), 403
+
+	try:
+		data = request.get_json()
+		name = data['name']
+		email = data['email']
+
+		if not name or not email:
+			return error(result,"建立失敗，名字與email為資料更新必填欄位"), 400
+
+		memberId = userInfo["id"]
+		con = conPool.get_connection()
+		cursor = con.cursor()
+
+		if len(data) == 3:
+			password = data['password']
+			cursor.execute("UPDATE member set name=%s, email=%s, password=%s WHERE id = %s",(name, email, password, memberId))
+			con.commit()
+		else:
+			cursor.execute("UPDATE member set name=%s, email=%s WHERE id = %s",(name, email, memberId))
+			con.commit()			
+
+		cursor.close()
+		con.close()
+
+		result["ok"] = True
+		return result, 200
+		
+	except Exception as e:
+		return error(result, e.__class__.__name__+": "+str(e)), 500
+
+# @app.route("/api/profile",methods=['GET'])
+# def getProfile():
+# 	result = {}
+# 	try:
+# 		token = request.headers['Authorization'][7:]
+# 		userInfo = jwt.decode(token, key, algorithms="HS256")
+# 	except:
+# 		return error(result,"未登入系統，拒絕存取"), 403
+
+	# try:
+		# memberId = userInfo["id"]
+		# con = conPool.get_connection()
+		# cursor = con.cursor()
+		
+		# sql = "SELECT name, email, password from member WHERE memberId = %s"
+
+		# cursor.execute(sql,(memberId,))
+		# data = cursor.fetchall()
+
+		# cursor.close()
+		# con.close()
+		# result["data"] = {}
+
+	# 	if len(data) == 0:
+	# 		result["data"] = None
+	# 		return result, 200
+
+
+	# 	return result, 200		
+
+	# except Exception as e:
+	# 	return error(result, e.__class__.__name__+": "+str(e)), 500
 
 app.run(host="0.0.0.0", port=3000)

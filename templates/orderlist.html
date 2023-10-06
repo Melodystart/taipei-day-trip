@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="../template.css">
+{% endblock %}
+
+{% block main %}
+<div class="separator-nav">
+</div>
+
+<div class="headline">您好，<span class="userName"></span>，請點選「訂單編號」檢視「訂單明細」：</div>
+
+<div class="booking-content">
+  <div class="booking-container" id="booking-list">
+
+  </div>
+</div>
+
+<div class="booking-none"></div>
+{% endblock %}
+
+
+{% block js %}
+<script>
+  function getOders() {
+
+    /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+    getStatus().then(userInfo => {
+
+      if (userInfo === null) {
+        window.location.href = '/'
+      };
+
+      const getMethod = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+      }
+
+      fetch('/api/orders', getMethod)
+        .then(response => response.json())
+        .then(responseJson => {
+          console.log(responseJson["data"])
+          document.querySelector(".userName").textContent = userInfo["name"];
+          if (responseJson["data"] === null) {
+            document.querySelector(".booking-none").style.display = "flex";
+            document.querySelector(".booking-none").textContent = "目前沒有任何訂單編號";
+            document.querySelector(".booking-content").style.display = "none";
+            document.querySelector(".attraction-footer").style.height = "100%";
+          } else {
+            document.querySelector(".booking-content").style.display = "block";
+            document.querySelector(".booking-none").style.display = "none";
+
+            responseJson["data"].forEach(data => {
+
+              const order = document.createElement("div");
+              order.classList.add("booking-section");
+
+              order.innerHTML = `
+              <a class="booking-section" href="/order?orderNumber=${data["orderId"]}" style="text-decoration:none";>
+                <div class="booking-picture">
+                  <img class="booking-img" src="${data["firstImage"]}">
+                </div>
+                <div class="booking-info">
+                  <div class="delete"">
+                      <img class="search-order-bg" src="/picture/search.png">
+                  </div>
+                  <div class="booking-info-title">訂單編號：<span class="booking-info-attraction">${data["orderId"]}</span></div>
+                  <div class="booking-info-item">交易日期：<span class="booking-info-date">${data["transactionDate"]}</span></div>
+                  <div class="booking-info-item">付款狀態：<span class="booking-info-time" id="payment-status">${data["paymentStatus"]}</span></div>
+                  <div class="booking-info-item">訂單金額：<span class="booking-info-price">新台幣 ${data["amount"]} 元</span></div>
+                  <div class="booking-info-item" id="booking-address">付款備註：<span class="booking-info-address">${data["msg"]}</span></div>
+                </div>
+              </a>
+              `
+              document.querySelector("#booking-list").appendChild(order)
+            })
+          }
+        })
+    })
+  }
+
+  getOders();
+
+</script>
+{% endblock %}
