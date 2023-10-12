@@ -1340,6 +1340,11 @@
     justify-content: center;
   }
 
+  .profile-main {
+    display: flex;
+    justify-content: center;
+  }
+
   .thank-container {
     padding: 20px;
     margin: 0 auto;
