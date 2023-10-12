@@ -28,19 +28,20 @@
       .then(userInfo => {
 
         if (userInfo === null) {
-          window.location.href = '/'
-        };
-
-
-        const words = decodeURIComponent(window.location.search).split("&");
-        const orderId = words[0].slice(words[0].indexOf("=") + 1);
-        const msg = words[1].slice(words[1].indexOf("=") + 1);
-        if (msg === "付款成功") {
-          document.querySelector("#msg").textContent = msg + "：祝您旅途愉快!";
+          return window.location.href = '/'
         } else {
-          document.querySelector("#msg").textContent = msg;
+          document.querySelector(".attraction-footer").style.height = "100%";
+          document.querySelector(".thank-main").style.display = "flex";
+          const words = decodeURIComponent(window.location.search).split("&");
+          const orderId = words[0].slice(words[0].indexOf("=") + 1);
+          const msg = words[1].slice(words[1].indexOf("=") + 1);
+          if (msg === "付款成功") {
+            document.querySelector("#msg").textContent = msg + "：祝您旅途愉快!";
+          } else {
+            document.querySelector("#msg").textContent = msg;
+          }
+          document.querySelector("#orderId").textContent = "訂單編號：" + orderId;
         }
-        document.querySelector("#orderId").textContent = "訂單編號：" + orderId;
 
       })
       .catch(error => console.error("Error:", error))

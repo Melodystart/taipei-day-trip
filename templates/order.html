@@ -54,7 +54,7 @@
     longinStatus.then(userInfo => {
 
       if (userInfo === null) {
-        window.location.href = '/'
+        return window.location.href = '/'
       };
 
       const getMethod = {
@@ -70,7 +70,7 @@
         .then(responseJson => {
 
           if (responseJson["data"] === null) {
-            window.location.href = '/'
+            return window.location.href = '/'
           } else {
             document.querySelector(".booking-content").style.display = "block";
             document.querySelector(".content").style.display = "block";

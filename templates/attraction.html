@@ -120,7 +120,7 @@
       .then(response => response.json())
       .then(responseJson => {
         if (responseJson["error"]) {
-          window.location.href = '/'
+          return window.location.href = '/'
         } else {
           return responseJson["data"]
         }

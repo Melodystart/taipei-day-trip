@@ -1336,7 +1336,7 @@
   }
 
   .thank-main {
-    display: flex;
+    display: none;
     justify-content: center;
   }
 

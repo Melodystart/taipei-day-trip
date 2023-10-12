@@ -85,7 +85,7 @@
     longinStatus.then(userInfo => {
 
       if (userInfo === null) {
-        window.location.href = '/'
+        return window.location.href = '/'
       };
 
       const getMethod = {
@@ -167,7 +167,7 @@
     longinStatus.then(userInfo => {
 
       if (userInfo === null) {
-        window.location.href = '/'
+        return window.location.href = '/'
       };
 
       const deleteMethod = {

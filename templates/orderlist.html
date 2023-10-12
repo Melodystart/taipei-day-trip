@@ -30,7 +30,7 @@
     longinStatus.then(userInfo => {
 
       if (userInfo === null) {
-        window.location.href = '/'
+        return window.location.href = '/'
       };
 
       const getMethod = {
@@ -54,7 +54,7 @@
           } else {
             document.querySelector(".booking-content").style.display = "block";
             document.querySelector(".booking-none").style.display = "none";
-
+            document.querySelector(".attraction-footer").style.height = "100%";
             responseJson["data"].forEach(data => {
 
               const order = document.createElement("div");
