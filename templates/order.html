@@ -5,41 +5,43 @@
 {% endblock %}
 
 {% block main %}
-<div class="separator-nav">
-</div>
-
-<div class="headline">
-  <div>訂單編號：<span class="userName" id="orderNumber"></span></div>
-  <div><span class="userName" id="orderMsg"></span></div>
-</div>
-
-<div class="booking-content">
-  <div class="booking-container" id="booking-list">
-
+<div class="content">
+  <div class="separator-nav">
   </div>
 
-  <div class="booking-container">
-    <div class="booking-confirm">
-      <div class="booking-total"></div>
+  <div class="headline">
+    <div>訂單編號：<span class="userName" id="orderNumber"></span></div>
+    <div><span class="userName" id="orderMsg"></span></div>
+  </div>
+
+  <div class="booking-content">
+    <div class="booking-container" id="booking-list">
+
     </div>
-  </div>
 
-  <div class="separator-booking" id="separator-shorten">
-  </div>
-
-  <div class="booking-container">
-    <div class="contact-form">
-      <div class="contact-form-title">您的聯絡資訊</div>
-      <div class="contact-form-item">聯絡姓名：<span class="contact-name"></span></div>
-      <div class="contact-form-item">聯絡信箱：<span class="contact-email"></span></div>
-      <div class="contact-form-item" id="phone-text">手機號碼：<span class="contact-phone"></span></div>
-      <div class="contact-form-item" id="contact-notice"><span class="contact-notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫。</span>
+    <div class="booking-container">
+      <div class="booking-confirm">
+        <div class="booking-total"></div>
       </div>
     </div>
+
+    <div class="separator-booking" id="separator-shorten">
+    </div>
+
+    <div class="booking-container">
+      <div class="contact-form">
+        <div class="contact-form-title">您的聯絡資訊</div>
+        <div class="contact-form-item">聯絡姓名：<span class="contact-name"></span></div>
+        <div class="contact-form-item">聯絡信箱：<span class="contact-email"></span></div>
+        <div class="contact-form-item" id="phone-text">手機號碼：<span class="contact-phone"></span></div>
+        <div class="contact-form-item" id="contact-notice"><span
+            class="contact-notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫。</span>
+        </div>
+      </div>
+    </div>
+
   </div>
-
 </div>
-
 {% endblock %}
 
 
@@ -48,8 +50,8 @@
 
   function getOrder(orderNumber) {
 
-    /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
-    getStatus().then(userInfo => {
+    /*longinStatus為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+    longinStatus.then(userInfo => {
 
       if (userInfo === null) {
         window.location.href = '/'
@@ -66,10 +68,12 @@
       fetch('/api/order/' + orderNumber, getMethod)
         .then(response => response.json())
         .then(responseJson => {
+
           if (responseJson["data"] === null) {
             window.location.href = '/'
           } else {
             document.querySelector(".booking-content").style.display = "block";
+            document.querySelector(".content").style.display = "block";
 
             responseJson["data"]["details"].forEach(data => {
 

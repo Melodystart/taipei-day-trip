@@ -26,15 +26,18 @@
             <span class="nav-button2-text">登入/註冊</span>
           </div>
           <div class="member">
-            <div class="nav-button2" id="member-center">
-              <span class="nav-button2-text">會員中心</span>
+            <div id="member-center">
+              <div class="nav-button2">
+                <span class="nav-button2-text">會員中心</span>
+              </div>
+              <img class="nav-avatar" src="/uploads/default.png">
             </div>
             <div class="member-container">
               <div class="nav-button2" id="booking-quiry">
                 <span class="nav-button2-text" id="booking-quiry-text">訂單查詢</span>
               </div>
               <div class="nav-button2" id="member-account">
-                <span class="nav-button2-text" id="member-account-text">我的帳戶</span>
+                <span class="nav-button2-text" id="member-account-text">會員頁面</span>
               </div>
               <div class="nav-button2" id="logout">
                 <span class="nav-button2-text" id="logout-text">登出</span>
@@ -56,9 +59,11 @@
         </div>
         <div class="dialog-main">
           <div class="dialog-title">登入會員帳號</div>
-          <div class="input-email"><input type="text" class="input-text" id="email" name="email" placeholder="輸入電子郵件">
+          <div class="input-email"><input type="email" class="input-text" id="email" name="email" placeholder="輸入電子郵件"
+              required>
           </div>
-          <div class="input"><input type="password" class="input-text" id="password" name="password" placeholder="輸入密碼">
+          <div class="input"><input type="password" class="input-text" id="password" name="password" placeholder="輸入密碼"
+              required>
           </div>
           <button class="dialog-button" onclick="signin()">登入帳戶</button>
           <div class="message"></div>
@@ -89,10 +94,17 @@
     const memberAccount = document.querySelector("#member-account");
     const logoutBtn = document.querySelector("#logout");
 
+    function validateEmail(email) {
+      let re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      return re.test(email);
+    }
+
     function signup() {
       const username = document.querySelector("#username").value.trim()
       const email = document.querySelector("#email").value.trim()
       const password = document.querySelector("#password").value.trim()
+      if (!username || !email || !password) { return alert("欄位皆為必填") }
+      if (!validateEmail(email)) { return alert("email格式不正確") }
       const postMethod = {
         method: 'POST',
         headers: {
@@ -122,6 +134,8 @@
     function signin() {
       const email = document.querySelector("#email").value.trim()
       const password = document.querySelector("#password").value.trim()
+      if (!email || !password) { return alert("欄位皆為必填") }
+      if (!validateEmail(email)) { return alert("email格式不正確") }
       const putMethod = {
         method: 'PUT',
         headers: {
@@ -203,7 +217,7 @@
       const userInfo = fetch('/api/user/auth', getMethod)
         .then(response => response.json())
         .then(responseJson => {
-
+          document.querySelector(".nav-container").style.display = "flex";
           if (responseJson["data"] === null) {
             document.querySelector("#member-center").style.display = "none";
             document.querySelector("#login").style.display = "flex";
@@ -214,6 +228,9 @@
             document.querySelector("#member-center").style.display = "flex";
             document.querySelector("#login").style.display = "none";
             document.querySelector("#logout").onclick = function () { logout(); };
+            if (responseJson["data"]["filename"] !== null) {
+              document.querySelector(".nav-avatar").src = "/uploads/" + responseJson["data"]["id"] + "/" + responseJson["data"]["filename"];
+            }
             return responseJson["data"];
           }
         })
@@ -222,7 +239,7 @@
       return userInfo
     }
 
-    getStatus();
+    const longinStatus = getStatus();
 
     loginBtn.addEventListener("click", () => {
       dialog.style.display = "flex";

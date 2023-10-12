@@ -60,7 +60,7 @@
         <div class="booking-date-container">
           <span class="placeholder">yyyy/mm/dd</span>
           <!-- <input type="text" class="date" onfocus="(this.type='date')" required> -->
-          <input type="date" class="date" required>
+          <input type="date" class="date" min="" required>
         </div>
       </div>
       <div class="booking-time">
@@ -138,6 +138,10 @@
     document.querySelector(".profile-category").textContent = data["category"] + " at " + data["mrt"]
     document.querySelector(".description").textContent = data["description"]
     document.querySelector(".transport").textContent = data["transport"]
+    const date = new Date()
+    date.setDate(date.getDate() + 1);
+    const tomorrow = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    document.querySelector(".date").min = tomorrow;
 
     function loadImgCount() {
       loadImgNum++;
@@ -175,8 +179,8 @@
   }
 
   function booking() {
-    /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
-    getStatus().then(userInfo => {
+    /*longinStatus為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+    longinStatus.then(userInfo => {
 
       if (userInfo === null) {
         dialog.style.display = "flex";
@@ -188,6 +192,9 @@
 
       } else {
         const date = document.querySelector(".date").value;
+        const today = new Date()
+        if (!date) { return alert("請選擇日期") }
+        if (new Date(date) <= today) { return alert("無法選今天及過去日期") }
         const postMethod = {
           method: 'POST',
           headers: {

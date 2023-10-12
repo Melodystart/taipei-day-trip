@@ -1,3 +1,4 @@
+from dotenv import get_key
 import json
 import mysql.connector
 
@@ -8,8 +9,8 @@ data = original_data["result"]["results"]
 
 con = mysql.connector.connect(
     host='localhost',           
-    user='root',                
-    password='password',
+    user= get_key("../.env", "user"),                
+    password= get_key("../.env", "password"),
 )
 cursor = con.cursor()
 
@@ -19,7 +20,7 @@ cursor.execute("CREATE database attractions;")
 cursor.execute("USE attractions;")
 cursor.execute("CREATE table main (id BIGINT PRIMARY KEY NOT NULL,name VARCHAR(255),category VARCHAR(255),description TEXT,address TEXT,transport TEXT,mrt VARCHAR(255),lat DECIMAL(8,6),lng DECIMAL(9,6));")
 cursor.execute("CREATE table image (id BIGINT PRIMARY KEY auto_increment,attraction_id BIGINT NOT NULL,images TEXT);")
-cursor.execute("CREATE table member (id BIGINT PRIMARY KEY auto_increment,name VARCHAR(255) NOT NULL,password VARCHAR(255) NOT NULL,email VARCHAR(255) NOT NULL,time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP());")
+cursor.execute("CREATE table member (id BIGINT PRIMARY KEY auto_increment,name VARCHAR(255) NOT NULL,password VARCHAR(255) NOT NULL,email VARCHAR(255) NOT NULL,time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(), filename VARCHAR(255));")
 cursor.execute("CREATE table booking (id BIGINT PRIMARY KEY auto_increment,memberId BIGINT NOT NULL,attractionId BIGINT NOT NULL,date DATE NOT NULL,time VARCHAR(255) NOT NULL, price SMALLINT NOT NULL, orderId VARCHAR(255), paymentStatus VARCHAR(255) NOT NULL DEFAULT '未付款');")
 cursor.execute("CREATE table orders (id BIGINT PRIMARY KEY auto_increment, orderId VARCHAR(255) NOT NULL, memberId BIGINT NOT NULL, paymentStatus VARCHAR(255) NOT NULL, amount BIGINT NOT NULL, contactName VARCHAR(255) NOT NULL, contactEmail VARCHAR(255) NOT NULL, contactPhone VARCHAR(255) NOT NULL, statusCode BIGINT, msg VARCHAR(255), rec_trade_id VARCHAR(255), bookingIdList TEXT NOT NULL, transactionDate VARCHAR(255) NOT NULL, firstImage TEXT);")
 # 將資料存入MySQL
