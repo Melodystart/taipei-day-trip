@@ -251,8 +251,8 @@
     })
 
     bookingBtn.addEventListener("click", () => {
-      /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
-      getStatus().then(userInfo => {
+      /*longinStatus為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+      longinStatus.then(userInfo => {
         if (userInfo === null) {
           dialog.style.display = "flex";
           message.style.display = 'none';
