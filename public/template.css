@@ -422,6 +422,8 @@
     height: 24px;
     padding: 5px 15px 5px 15px;
     gap: 4px;
+    display: flex;
+    align-items: center;
   }
 
   .itemText {

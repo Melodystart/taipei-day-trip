@@ -1,21 +1,21 @@
 from flask import *
-from model.attraction import attraction
-from model.user import user
-from model.order import order
-from model.booking import booking
-from view.view import view
+from controller.attraction import attraction
+from controller.user import user
+from controller.order import order
+from controller.booking import booking
+from view.template import template
 
 app=Flask(__name__)
 app.config["JSON_AS_ASCII"]=False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 
-# Model
+# Controller
 app.register_blueprint(booking, url_prefix="/api/booking")
 app.register_blueprint(user, url_prefix="/api/user")
 app.register_blueprint(attraction)
 app.register_blueprint(order)
 
 # View
-app.register_blueprint(view)
+app.register_blueprint(template)
 
 app.run(host="0.0.0.0", port=3000)

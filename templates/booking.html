@@ -194,13 +194,7 @@
 
   }
 
-  let total = 0;
-  let orders = [];
-  let bookingIdList = [];
-  getBooking();
-
   const submitButton = document.querySelector(".booking-submit-button")
-
   let fields = {
     number: {
       element: '#card-number',
@@ -386,6 +380,11 @@
         .catch(error => console.error("Error:", error))
     })
   }
+
+  let total = 0;
+  let orders = [];
+  let bookingIdList = [];
+  getBooking();
 
 </script>
 {% endblock %}

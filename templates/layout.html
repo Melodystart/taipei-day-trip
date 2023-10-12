@@ -82,18 +82,6 @@
   </footer>
 
   <script>
-    const loginBtn = document.querySelector("#login");
-    const bookingBtn = document.querySelector("#booking");
-    const dialog = document.querySelector(".dialog-mask");
-    const dialogClose = document.querySelector(".dialog-close");
-    const dialogBox = document.querySelector(".dialog-box");
-    const dialogMain = document.querySelector(".dialog-main");
-    const message = document.querySelector(".message");
-    const memberCenter = document.querySelector("#member-center");
-    const bookingQuiry = document.querySelector("#booking-quiry");
-    const memberAccount = document.querySelector("#member-account");
-    const logoutBtn = document.querySelector("#logout");
-
     function validateEmail(email) {
       let re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
       return re.test(email);
@@ -240,6 +228,18 @@
     }
 
     const longinStatus = getStatus();
+    
+    const loginBtn = document.querySelector("#login");
+    const bookingBtn = document.querySelector("#booking");
+    const dialog = document.querySelector(".dialog-mask");
+    const dialogClose = document.querySelector(".dialog-close");
+    const dialogBox = document.querySelector(".dialog-box");
+    const dialogMain = document.querySelector(".dialog-main");
+    const message = document.querySelector(".message");
+    const memberCenter = document.querySelector("#member-center");
+    const bookingQuiry = document.querySelector("#booking-quiry");
+    const memberAccount = document.querySelector("#member-account");
+    const logoutBtn = document.querySelector("#logout");
 
     loginBtn.addEventListener("click", () => {
       dialog.style.display = "flex";
