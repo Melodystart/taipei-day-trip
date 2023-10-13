@@ -1,6 +1,6 @@
-from model.order import Order
+from model.order import OrderModel
+from view.order import OrderView
 from dotenv import get_key
-import time
 import jwt
 import requests
 from flask import *
@@ -24,20 +24,9 @@ def ordering():
 		return error(result,"未登入系統，拒絕存取"), 403
 
 	try:
-		order = Order()
 		try:
 			data = request.get_json()
-			memberId = userInfo["id"]
-			prime = data['prime']
-			amount = data['order']['amount']
-			contactName = data['order']['contact']['name']
-			contactEmail = data['order']['contact']['email']
-			contactPhone = data['order']['contact']['phone']
-			bookingIdList = data['order']["bookingIdList"]
-			firstImage = data['order']['details'][0]['trip']['attraction']['image']
-			transactionTime = time.localtime()
-			transactionDate = str(time.strftime("%Y/%m/%d %H:%M", transactionTime))
-			orderId = str(time.strftime("%Y%m%d%H%M%S", transactionTime)) + str(memberId)
+			memberId, prime, amount, contactName, contactEmail, contactPhone, bookingIdList, firstImage, transactionTime, transactionDate, orderId = OrderView.ordering(userInfo, data)
 			bookingIds = ""
 
 			if not memberId or not prime or not amount or not contactName or not contactEmail or not contactPhone or not bookingIdList or not orderId or len(contactPhone) != 10:
@@ -45,71 +34,46 @@ def ordering():
 
 			for bookingId in bookingIdList:
 
-				data = order.check_payment_status(bookingId)
+				data = OrderModel.check_payment_status(bookingId)
 				if data != None:
 					return error(result,"訂單建立失敗，此訂單含已付過款行程，請重新整理預定行程頁面"), 400
 				bookingIds += str(bookingId) + ","
 				
 			bookingIds = bookingIds.strip(",")
 
-			order.create(orderId, memberId, amount, contactName,contactEmail, contactPhone, bookingIds, transactionDate, firstImage)
+			OrderModel.create(orderId, memberId, amount, contactName,contactEmail, contactPhone, bookingIds, transactionDate, firstImage)
 
 			for bookingId in bookingIdList:
-				order.record_number_tobooking(orderId, bookingId, memberId)
+				OrderModel.record_number_tobooking(orderId, bookingId, memberId)
 
 		except Exception as e:
 			return error(result, "訂單建立失敗，輸入不正確或其他原因"+e.__class__.__name__+": "+str(e)), 400
 
 		partner_key = get_key(".env", "partner_key")
 		merchant_id = 'start99start_CTBC'
-
 		url = 'https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime'
 		headers = {'Content-Type': 'application/json','x-api-key': partner_key}
-
-		payment_details = {
-			"prime": prime,
-			"partner_key": partner_key,
-			"merchant_id": merchant_id,
-			"details":"台北一日遊",
-			"amount": amount,
-			"order_number": orderId,
-			"cardholder": {
-					"phone_number": contactPhone,
-					"name": contactName,
-					"email": contactEmail,
-					"zip_code": "100",
-					"address": "台北市天龍區芝麻街1號1樓",
-					"national_id": "A123456789"
-			},
-			"remember": False
-		}
+		payment_details = OrderView.payment_details(prime, partner_key, merchant_id, amount, orderId, contactPhone, contactName, contactEmail)
 
 		r = requests.post(url, json=payment_details, headers=headers).json()
 
-		result["data"] = {}
-		result["data"]["number"] = orderId
-		result["data"]["payment"] = {}
-		result["data"]["payment"]["status"] = r["status"]
+		result, rec_status, rec_msg, rec_trade_id = OrderView.payment_result(result, orderId, r)
 
-		rec_status = r["status"]
-		rec_msg = r["msg"]
-		rec_trade_id = r["rec_trade_id"]
-
-		if int(r["status"]) == 0:
+		if int(rec_status) == 0:
 
 			if r["order_number"] != orderId:
-				order.record_payment("付款異常", rec_status, rec_msg, rec_trade_id, orderId, memberId)
+				OrderModel.record_payment("付款異常", rec_status, rec_msg, rec_trade_id, orderId, memberId)
 				return error(result,"付款訂單號碼與回傳訂單號碼不符，請聯絡專人處理"), 500
 			else:
-				order.record_payment("已付款", rec_status, rec_msg, rec_trade_id, orderId, memberId)
+				OrderModel.record_payment("已付款", rec_status, rec_msg, rec_trade_id, orderId, memberId)
 
 			for bookingId in bookingIdList:
-				order.record_payment_tobooking(bookingId, memberId)
+				OrderModel.record_payment_tobooking(bookingId, memberId)
 
 			result["data"]["payment"]["message"] = "付款成功"
 			return result, 200
 		else:
-			order.record_payment_failure(rec_status, rec_msg, rec_trade_id, orderId, memberId)
+			OrderModel.record_payment_failure(rec_status, rec_msg, rec_trade_id, orderId, memberId)
 			result["data"]["payment"]["message"] = "付款失敗："+ r["msg"]
 			return result, 200
 
@@ -126,24 +90,9 @@ def getOrders():
 		return error(result,"未登入系統，拒絕存取"), 403
 
 	try:
-		order = Order()
 		memberId = userInfo["id"]
-		data = order.get_orders(memberId)
-		result["data"] = []
-
-		if len(data) == 0:
-			result["data"] = None
-			return result, 200
-
-		for i in range(len(data)):
-			item = {}
-			item["orderId"] = data[i][0]
-			item["transactionDate"] = data[i][1]
-			item["paymentStatus"] = data[i][2]
-			item["amount"] = data[i][3]
-			item["msg"] = data[i][4]
-			item["firstImage"] = data[i][5]
-			result["data"].append(item)
+		data = OrderModel.get_orders(memberId)
+		result = OrderView.orders(result, data)
 		return result, 200		
 	except Exception as e:
 		return error(result, e.__class__.__name__+": "+str(e)), 500
@@ -158,40 +107,21 @@ def getOrderDetails(orderNumber):
 		return error(result,"未登入系統，拒絕存取"), 403
 
 	try:
-		order = Order()
 		memberId = userInfo["id"]
-		data = order.get_order(memberId, orderNumber)
+		data = OrderModel.get_order(memberId, orderNumber)
 
 		if len(data) == 0:
 			result["data"] = None
 			return result, 200
 
-		result["data"] = {}
-		result["data"]["number"] = orderNumber
-		result["data"]["amount"] = data[1]
-		result["data"]["contact"] = {}
-		result["data"]["contact"]["name"] = data[2]
-		result["data"]["contact"]["email"] = data[3]
-		result["data"]["contact"]["phone"] = data[4]
-		result["data"]["status"] = data[5]
-		result["data"]["msg"] = data[6]
-		result["data"]["details"] = []
+		result = OrderView.order(result, data, orderNumber)
 
 		bookingIdList = data[0].split(',')
 
 		for i in range(len(bookingIdList)):
 			bookingId = bookingIdList[i]
-			attraction = order.get_order_booking(memberId, bookingId)
-			item = {}
-			item["price"] = attraction[0]
-			item["trip"] = {}
-			item["trip"]["date"] = attraction[1].strftime("%Y-%m-%d")
-			item["trip"]["time"] = attraction[2]
-			item["trip"]["attraction"] = {}
-			item["trip"]["attraction"]["id"] = attraction[3]
-			item["trip"]["attraction"]["name"] = attraction[4]
-			item["trip"]["attraction"]["address"] = attraction[5]
-			item["trip"]["attraction"]["image"] = attraction[6].split(',')[0]
+			attraction = OrderModel.get_order_booking(memberId, bookingId)
+			item = OrderView.booking_in_order(attraction)
 			result["data"]["details"].append(item)
 
 		return result, 200		

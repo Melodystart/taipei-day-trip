@@ -1,9 +1,9 @@
 from config import conPool
 from flask import *
 
-class Booking:
-
-	def get_booking(self, memberId):
+class BookingModel:
+	@staticmethod
+	def get_booking(memberId):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 		
@@ -16,8 +16,8 @@ class Booking:
 		con.close()
 		return data
 
-
-	def post_booking(self,memberId, attractionId, date, time, price):
+	@staticmethod
+	def post_booking(memberId, attractionId, date, time, price):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
@@ -27,8 +27,8 @@ class Booking:
 		cursor.close()
 		con.close()
 
-
-	def delete_booking(self, memberId,bookingId):
+	@staticmethod
+	def delete_booking(memberId,bookingId):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 		

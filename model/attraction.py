@@ -1,9 +1,9 @@
 from config import conPool
 from flask import *
 
-class Attraction:
-
-	def get_attractions(self, keyword, page):
+class AttractionModel:
+	@staticmethod
+	def get_attractions(keyword, page):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
@@ -26,8 +26,8 @@ class Attraction:
 		con.close()
 		return data
 
-
-	def get_attraction(self, attractionId):
+	@staticmethod
+	def get_attraction(attractionId):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 		
@@ -42,8 +42,8 @@ class Attraction:
 		con.close()
 		return data
 	
-
-	def get_mrts(self):
+	@staticmethod
+	def get_mrts():
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
