@@ -5,18 +5,20 @@
 {% endblock %}
 
 {% block main %}
-<div class="separator-nav">
-</div>
-
-<div class="headline">您好，<span class="userName"></span>，請點選「訂單編號」檢視「訂單明細」：</div>
-
-<div class="booking-content">
-  <div class="booking-container" id="booking-list">
-
+<div class="content">
+  <div class="separator-nav">
   </div>
-</div>
 
-<div class="booking-none"></div>
+  <div class="headline">您好，<span class="userName"></span>，請點選「訂單編號」檢視「訂單詳情」：</div>
+
+  <div class="booking-content">
+    <div class="booking-container" id="booking-list">
+
+    </div>
+  </div>
+
+  <div class="booking-none"></div>
+</div>
 {% endblock %}
 
 
@@ -24,11 +26,11 @@
 <script>
   function getOders() {
 
-    /*getStatus()為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
-    getStatus().then(userInfo => {
+    /*longinStatus為layout.html的getStatus()回傳呼叫API驗證會員登入的結果*/
+    longinStatus.then(userInfo => {
 
       if (userInfo === null) {
-        window.location.href = '/'
+        return window.location.href = '/'
       };
 
       const getMethod = {
@@ -42,24 +44,24 @@
       fetch('/api/orders', getMethod)
         .then(response => response.json())
         .then(responseJson => {
-          console.log(responseJson["data"])
+          document.querySelector(".content").style.display = "block";
           document.querySelector(".userName").textContent = userInfo["name"];
           if (responseJson["data"] === null) {
             document.querySelector(".booking-none").style.display = "flex";
-            document.querySelector(".booking-none").textContent = "目前沒有任何訂單編號";
+            document.querySelector(".booking-none").textContent = "目前沒有任何訂單";
             document.querySelector(".booking-content").style.display = "none";
             document.querySelector(".attraction-footer").style.height = "100%";
           } else {
             document.querySelector(".booking-content").style.display = "block";
             document.querySelector(".booking-none").style.display = "none";
-
+            document.querySelector(".attraction-footer").style.height = "100%";
             responseJson["data"].forEach(data => {
 
               const order = document.createElement("div");
               order.classList.add("booking-section");
 
               order.innerHTML = `
-              <a class="booking-section" href="/order?orderNumber=${data["orderId"]}" style="text-decoration:none";>
+              <a class="booking-section" id="order-section" href="/order?orderNumber=${data["orderId"]}" style="text-decoration:none";>
                 <div class="booking-picture">
                   <img class="booking-img" src="${data["firstImage"]}">
                 </div>
