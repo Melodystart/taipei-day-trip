@@ -15,7 +15,7 @@ app.register_blueprint(user, url_prefix="/api/user")
 app.register_blueprint(attraction)
 app.register_blueprint(order)
 
-# View
+# Temeplate
 app.register_blueprint(template)
 
 app.run(host="0.0.0.0", port=3000)
