@@ -1,10 +1,10 @@
-from model.user import User
+from model.user import UserModel
+from view.user import UserView
 import shutil
 import os
 import pathlib
 from dotenv import get_key
 import jwt
-from datetime import datetime, timedelta
 import requests
 from flask import *
 
@@ -22,20 +22,17 @@ def signup():
 	result = {}
 	try:
 		data = request.get_json()
-		name = data['name'].strip()
-		email = data['email'].strip()
-		password = data['password'].strip()
+		name, email, password = UserView.signup(data)
 
 		if not name or not email or not password:
 			return error(result,"註冊失敗：欄位皆為必填"), 400
 		
-		user = User()
-		data = user.check_signup(email)
+		data = UserModel.check_signup(email)
 
 		if data != None:
 			return error(result,"註冊失敗：email已註冊過"), 400
 		else:
-			user.signup(name, email, password)
+			UserModel.signup(name, email, password)
 			result["ok"] = True
 			return result, 200
 
@@ -47,24 +44,17 @@ def signin():
 	result = {}
 	try:
 		data = request.get_json()
-		email = data["email"].strip()
-		password = data["password"].strip()
+		email, password = UserView.signin(data)
 
 		if not email or not password:
 			return error(result,"登入失敗：欄位皆為必填"), 400
 
-		user = User()
-		data = user.signin(email, password)
+		data = UserModel.signin(email, password)
 
 		if ( data == None):
 			return error(result,"登入失敗：帳號或密碼錯誤"), 400
 		else:
-			payload = {}
-			payload["id"] = data[0]
-			payload["name"] = data[1] 
-			payload["email"] = data[2]
-			payload["exp"] = datetime.utcnow() + timedelta(days=7)
-
+			payload = UserView.payload(data)
 			result["token"] = jwt.encode(payload, key, algorithm="HS256")
 			return result, 200
 
@@ -74,19 +64,13 @@ def signin():
 @user.route("/auth",methods=['GET'])
 def getStatus():
 	result = {}
-	result["data"] ={}
 	try:
 		token = request.headers['Authorization'][7:]
 		userInfo = jwt.decode(token, key, algorithms="HS256")
 		userId = userInfo["id"]
-		user = User()
-		data = user.check_signin(userId)
-
-		result["data"]["id"] = userInfo["id"]
-		result["data"]["name"] = data[0]
-		result["data"]["email"] = data[1]
-		result["data"]["filename"] = data[2]
-		return result, 200		
+		data = UserModel.check_signin(userId)
+		result = UserView.signin_result(result, data, userId)
+		return result, 200
 
 	except:
 		result["data"] = None
@@ -127,8 +111,7 @@ def updatingProfile():
 				os.mkdir(UPLOAD_FOLDER)
 			file.save(os.path.join(UPLOAD_FOLDER, file.filename))
 
-		user = User()
-		user.update_profile(name, email, password, file, memberId)
+		UserModel.update_profile(name, email, password, file, memberId)
 
 		result["ok"] = True
 		return result, 200

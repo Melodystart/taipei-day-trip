@@ -1,9 +1,9 @@
 from config import conPool
 from flask import *
 
-class User:
-	
-	def check_signup(self,email):
+class UserModel:
+	@staticmethod	
+	def check_signup(email):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 		cursor.execute("SELECT email FROM member WHERE email=%s",(email,))
@@ -12,7 +12,8 @@ class User:
 		con.close()
 		return data
 
-	def signup(self, name, email, password):
+	@staticmethod
+	def signup(name, email, password):
 		con = conPool.get_connection()
 		cursor = con.cursor()			
 		cursor.execute("INSERT INTO member (name, email, password) VALUES (%s, %s, %s)",(name, email, password))
@@ -20,7 +21,8 @@ class User:
 		cursor.close()
 		con.close()
 
-	def signin(self, email, password):
+	@staticmethod
+	def signin(email, password):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 		cursor.execute("SELECT id, name, email FROM member WHERE email=%s AND password=%s",(email, password))
@@ -29,7 +31,8 @@ class User:
 		con.close()
 		return data
 
-	def check_signin(self, userId):
+	@staticmethod
+	def check_signin(userId):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 		sql = "SELECT name, email, filename from member WHERE id = %s"
@@ -39,7 +42,8 @@ class User:
 		con.close()
 		return data
 
-	def update_profile(self, name, email, password, file, memberId):
+	@staticmethod
+	def update_profile(name, email, password, file, memberId):
 		con = conPool.get_connection()
 		cursor = con.cursor()
 
