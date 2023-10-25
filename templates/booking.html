@@ -96,7 +96,7 @@
         },
       }
 
-      fetch('/api/booking', getMethod)
+      fetch('/api/booking/', getMethod)
         .then(response => response.json())
         .then(responseJson => {
           document.querySelector(".content").style.display = "block";
