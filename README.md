@@ -1,5 +1,5 @@
 # Taipei Day Trip
-> Taipei Day Trip is a E-commerce website and provide payment service with TapPay API.
+> Taipei Day Trip is a E-commerce website, which provide payment service with TapPay API.
 
 _**Link :**_ https://trip.abinitio.fun/
 
