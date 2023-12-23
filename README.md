@@ -13,27 +13,27 @@ Test card：4242-4242-4242-4242 | 12/25 | CVV 123
 [architecture]:./readme/Architecture.jpg
 
 ### Demo
-* 首頁
+* **首頁**
 ![][index]
 
 [index]:./readme/index.png
 
-* 特定景點頁面
+* **特定景點頁面**
 ![][attraction]
 
 [attraction]:./readme/attraction.png
 
-* 訂單刷卡頁面
+* **訂單刷卡頁面**
 ![][booking]
 
 [booking]:./readme/booking.png
 
-* 查詢歷史訂單
+* **查詢歷史訂單**
 ![][orderlist]
 
 [orderlist]:./readme/orderlist.png
 
-* 會員資料頁面
+* **會員資料頁面**
 ![][membership]
 
 [membership]:./readme/membership.png
