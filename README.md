@@ -1,10 +1,10 @@
 # Taipei Day Trip
 > Taipei Day Trip 為旅遊行程電子商務網站，登入會員可預訂行程、線上付款，並可查詢訂單紀錄及編輯會員資料。 
-- Connect TapPay API to provide online payment service.
-- Use RESTful API communication to connect frontend to backend.
-- Use MVC pattern to construct backend codes.
-- Validate user's identity with JWT authentication.
-- Build website using RWD for multiple devices.
+- Connect **TapPay** API to provide online payment service.
+- Use **RESTful API** communication to connect frontend to backend.
+- Use **MVC** pattern to construct backend codes.
+- Validate user's identity with **JWT** authentication.
+- Build website using **RWD** for multiple devices.
 
 ### Link 
 https://trip.abinitio.fun/
